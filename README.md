@@ -1,54 +1,65 @@
-# 译发 · Claude ZH-EN Relay
+# Yifa (译发) · Claude ZH-EN Relay
 
-在 claude.ai 上用中文对话，发送前自动把输入译成英文，回复再译回中文。目的是节省订阅的用量额度：同样一句话，中文占用的 token 通常是英文的 1.5 到 2 倍，让实际发送和模型回复都走英文，可以在撞到用量上限前多聊一些。
+English | [中文](README.zh-CN.md)
 
-翻译全过程可见、可撤销，扩展不修改任何 claude.ai 的网络请求，只在页面上操作文本。
+A Chrome extension for claude.ai: chat in Chinese, send in English, save your usage quota.
 
-## 工作方式
+Chinese text typically costs 1.5–2x more tokens than the equivalent English. This extension translates your Chinese input to English right before it is sent, and translates English replies back to Chinese for reading — so the entire conversation context stays in compact English, stretching a Pro/Max usage limit noticeably on long conversations.
 
-- 输入侧：在输入框打中文，回车后先译成英文。默认会暂停让人核对英文——这一步同时是防止“输入被译错却毫无察觉”的保险；确认后再由 claude.ai 正常发送。
-- 回复侧：回复渲染完成后，把英文译回中文。三种排版可选（见下）。
-- 划词翻译：选中回复中的任意文字，弹窗给出即时翻译，方向自动判断。技术内容里自动翻译难免有不准，这是精修的补充工具。
+Every translation is visible and reversible. The extension never touches network traffic; it only edits text on the page, the same way writing assistants and translation extensions do.
 
-## 安装
+## How it works
 
-1. 打开 `chrome://extensions`，右上角开启“开发者模式”。
-2. 点“加载已解压的扩展程序”，选择本项目文件夹。
-3. 打开或刷新 claude.ai 页面即可生效。
+- **Input side**: type Chinese in the normal input box and press Enter. The text is translated to English in place, and by default the send pauses so the English can be reviewed — this doubles as the safeguard against silent mistranslation. Confirm with Enter, or press Esc to restore the Chinese.
+- **Reply side**: once a reply finishes rendering, its English is translated back to Chinese. Three layout modes (see below).
+- **Select to translate**: select any text in a reply for an instant popup translation, direction auto-detected. Useful for double-checking technical passages.
 
-支持基于 Chromium 的浏览器（Chrome、Edge 等）。
+## Install
 
-## 建议先做一步设置
+1. Download the zip from [Releases](https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/releases) and unzip it, or clone this repo.
+2. Open `chrome://extensions` and enable Developer mode.
+3. Click "Load unpacked" and pick the project folder.
+4. Open or refresh claude.ai.
 
-扩展负责把输入译成英文，但没法替你决定模型用什么语言回复。要让省额度的效果最大化，需要让回复也走英文：
+Works on Chromium-based browsers (Chrome, Edge, etc.).
 
-在 claude.ai 新建一个 Project，自定义指令写上 `Always reply in English`，之后在该 Project 下对话即可。回复是英文，扩展再把它译回中文显示，整段对话的上下文就一直保持在更紧凑的英文，越长的对话省得越多。
+## Recommended one-time setup
 
-## 面板设置
+The extension translates your input, but it cannot decide which language the model replies in. To maximize quota savings, make the replies English too:
 
-- 启用扩展：总开关。
-- 翻译后自动发送：关闭时，译成英文后暂停核对，回车发送、Esc 撤回；开启时译好直接发出。
-- 回复译回中文：是否把英文回复译回中文。
-- 译文排版：
-  - 混合（推荐）：纯文字段落就地替换，点击可看原文；含代码或链接的段落在下方附译文，保留原始代码。
-  - 完整对照：保留原文，每段下方附中文译文，最完整、最一致。
-  - 仅纯文字：只替换纯文字段落，含代码或链接的段落保持英文。
+Create a claude.ai Project with the custom instruction `Always reply in English`, and chat inside that Project. Replies come back in English, the extension renders them in Chinese, and the whole context stays compact — the longer the conversation, the more it saves.
 
-## 翻译引擎
+## Settings (toolbar popup)
 
-当前使用 Google 的非官方翻译端点，无需 API key，开箱即用。它是非官方接口，可能限流或偶发失效；后续计划加入 DeepL 作为需要 key 的高质量备选。
+- **Enable** — master switch.
+- **Auto-send after translation** — off: pause for review, Enter to send, Esc to undo; on: send immediately once translated.
+- **Translate replies to Chinese** — toggle the reply side.
+- **Reply layout**:
+  - **Hybrid (recommended)** — plain-text paragraphs are replaced in place (click to see the original); paragraphs containing code or links get the translation appended below, keeping the original intact.
+  - **Full bilingual** — originals untouched, Chinese appended under every paragraph.
+  - **Plain text only** — only plain-text paragraphs are replaced; paragraphs with code or links stay English.
 
-## 隐私
+## Translation engine
 
-- 输入文本和回复文本会发送到 Google 翻译服务用于翻译。介意的内容请勿依赖本扩展。
-- 扩展不修改 claude.ai 的任何网络请求，不向任何自建服务器上传数据。
-- 设置项仅保存在浏览器本地。
+Currently Google's unofficial translate endpoint: no API key, works out of the box, but it may rate-limit or break occasionally. A keyed DeepL backend is planned as a higher-quality option.
 
-## 局限
+## Privacy
 
-- 依赖 claude.ai 的页面结构，对方改版后输入拦截或回复识别可能失效，需要更新选择器。
-- 机器翻译并不完美，尤其专有名词和代码语境。输入侧的误译风险已由“发送前核对英文”兜住；回复侧可点击看原文或用划词翻译核对。
+- Input and reply text is sent to Google's translation service for translation. Don't route anything sensitive through it.
+- The extension does not modify any claude.ai network requests and uploads nothing to any server of its own.
+- Settings are stored locally in the browser.
 
-## 使用与合规
+See [PRIVACY.md](PRIVACY.md).
 
-面向个人使用。在第三方网站页面上修改内容属于灰色地带，请勿大规模分发或用于商业用途。
+## Limitations
+
+- Depends on claude.ai's page structure; a redesign may break input interception or reply detection until selectors are updated.
+- Machine translation is imperfect, especially around jargon and code. The input side is guarded by the review-before-send pause; on the reply side, click through to the original or use select-to-translate.
+
+## Disclaimer
+
+A personal open-source tool, unaffiliated with Anthropic or Google. It only modifies how pages are displayed locally, the same category of behavior as common writing-assistant and translation extensions. Use at your own risk.
+
+## License
+
+[MIT](LICENSE)
