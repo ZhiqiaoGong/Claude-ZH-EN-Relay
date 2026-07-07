@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --bg: #ffffff;
+        --card: #ffffff;
+        --text: #1a202c;
+        --muted: #718096;
+        --border: #e8eaed;
+        --accent: #6366f1;
+        --track: #cbd5e0;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #1f2023;
+          --card: #292a2e;
+          --text: #e6e7ea;
+          --muted: #9aa0a8;
+          --border: #3a3c41;
+          --accent: #818cf8;
+          --track: #4a4d54;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        width: 300px;
+        margin: 0;
+        padding: 16px;
+        font-family: -apple-system, "PingFang SC", system-ui, sans-serif;
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg);
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin-bottom: 14px;
+      }
+      .logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        flex: none;
+      }
+      h1 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        line-height: 1.2;
+      }
+      .tagline {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2px 12px;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 42px;
+        padding: 6px 0;
+      }
+      .row + .row,
+      .select-row {
+        border-top: 1px solid var(--border);
+      }
+      .row .label {
+        font-size: 13px;
+      }
+      /* toggle switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 38px;
+        height: 22px;
+        flex: none;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: var(--track);
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 0.18s;
+      }
+      .slider::before {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        left: 2px;
+        top: 2px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+        transition: transform 0.18s;
+      }
+      .switch input:checked + .slider {
+        background: var(--accent);
+      }
+      .switch input:checked + .slider::before {
+        transform: translateX(16px);
+      }
+      select {
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 5px 8px;
+        cursor: pointer;
+      }
+      .submode {
+        margin: 0;
+        padding: 0 0 10px;
+        color: var(--muted);
+        font-size: 11.5px;
+        line-height: 1.5;
+      }
+      .hint {
+        margin: 12px 2px 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+      .hint b {
+        color: var(--text);
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img class="logo" src="icons/icon128.png" alt="" />
+      <div>
+        <h1>译发 · ZH-EN Relay</h1>
+        <p class="tagline">中文对话，发送英文，节省用量额度</p>
+      </div>
+    </header>
+
+    <div class="card">
+      <div class="row">
+        <span class="label">启用扩展</span>
+        <label class="switch">
+          <input type="checkbox" id="enabled" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <span class="label">翻译后自动发送</span>
+        <label class="switch">
+          <input type="checkbox" id="autoSend" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <span class="label">回复译回中文</span>
+        <label class="switch">
+          <input type="checkbox" id="translateReplies" />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="row select-row">
+        <span class="label">译文排版</span>
+        <select id="replyMode">
+          <option value="hybrid">混合（推荐）</option>
+          <option value="append">完整对照</option>
+          <option value="overlay">仅纯文字</option>
+        </select>
+      </div>
+      <p class="submode" id="modeHint"></p>
+    </div>
+
+    <p class="hint">
+      输入中文，回车后自动译为英文发送。<br />
+      默认先暂停核对：<b>回车</b> 发送，<b>Esc</b> 撤回；开启自动发送则直接发出。<br />
+      选中回复中的文字，可即时翻译。
+    </p>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

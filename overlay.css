@@ -1,0 +1,112 @@
+/* Status bar shown while translating and while awaiting send confirmation. */
+#zer-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: none;
+  max-width: 90vw;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #fff;
+  background: #6366f1;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  user-select: none;
+}
+
+#zer-bar b {
+  font-weight: 700;
+}
+
+#zer-bar.zer-info {
+  background: #818cf8;
+}
+
+#zer-bar.zer-ok {
+  background: #6366f1;
+}
+
+#zer-bar.zer-warn {
+  background: #b7791f;
+}
+
+/* Translated reply blocks: clickable to reveal the original. */
+.zer-tr {
+  cursor: pointer;
+  border-bottom: 1px dashed rgba(99, 102, 241, 0.45);
+}
+.zer-tr[data-zer-showing="orig"] {
+  border-bottom-color: rgba(99, 102, 241, 0.2);
+}
+
+/* Appended Chinese translation (for blocks with code/links). A separate
+   block below the original, visually grouped by a thin accent border. */
+.zer-append {
+  margin: 4px 0 0;
+  padding: 2px 0 2px 12px;
+  border-left: 2px solid rgba(99, 102, 241, 0.55);
+  color: #6b7280;
+  font-size: 0.92em;
+  line-height: 1.6;
+}
+
+/* Output-side status indicator, top-right. */
+#zer-out {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 2147483647;
+  display: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #fff;
+  background: #6366f1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+#zer-out.zer-info {
+  background: #6366f1;
+}
+#zer-out.zer-warn {
+  background: #b7791f;
+  cursor: pointer;
+}
+
+/* Select-to-translate pill and popup. */
+#zer-pill {
+  position: fixed;
+  z-index: 2147483647;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #fff;
+  background: #6366f1;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+#zer-popup {
+  position: fixed;
+  z-index: 2147483647;
+  max-width: 360px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a202c;
+  background: #fff;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  user-select: text;
+}
+#zer-popup.zer-fail {
+  color: #b7791f;
+}
