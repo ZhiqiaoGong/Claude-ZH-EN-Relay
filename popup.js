@@ -39,20 +39,39 @@ function renderEngine() {
   renderEngineNow();
 }
 
-// Show which engine is actually in effect — a chosen engine with no key
-// silently falls back to Google, and this is where the user finds that out.
+// Show which engine is actually in effect. A chosen engine with no key falls
+// back to Google; a chosen engine WITH a key is verified by a tiny live
+// translation, so a wrong or unusable key is caught here rather than silently
+// failing on every reply. Assumes chrome.storage already holds current values.
+let verifyToken = 0;
 function renderEngineNow() {
   const e = engineEl.value;
   const name = { google: "Google", deepl: "DeepL", gemini: "Gemini" }[e];
-  const hasKey =
-    e === "deepl"
-      ? !!deeplKeyEl.value.trim()
-      : e === "gemini"
-      ? !!geminiKeyEl.value.trim()
-      : true;
-  engineNowEl.textContent = hasKey
-    ? "当前生效：" + name
-    : "当前生效：Google（" + name + " 未填 key，已回退）";
+  verifyToken++;
+
+  if (e === "google") {
+    engineNowEl.textContent = "当前生效：Google";
+    return;
+  }
+  const key = e === "deepl" ? deeplKeyEl.value.trim() : geminiKeyEl.value.trim();
+  if (!key) {
+    engineNowEl.textContent = "当前生效：Google（" + name + " 未填 key，已回退）";
+    return;
+  }
+
+  engineNowEl.textContent = "验证 " + name + " 中…";
+  const mine = verifyToken; // ignore stale responses if settings changed again
+  chrome.runtime.sendMessage(
+    { type: "translate", text: "hello", from: "en", to: "zh-CN" },
+    (resp) => {
+      if (mine !== verifyToken) return;
+      if (!chrome.runtime.lastError && resp && resp.ok && resp.text) {
+        engineNowEl.textContent = "当前生效：" + name + " ✓";
+      } else {
+        engineNowEl.textContent = name + " key 无效或不可用 · 翻译会失败";
+      }
+    }
+  );
 }
 
 chrome.storage.local.get(DEFAULTS, (s) => {
@@ -85,17 +104,18 @@ replyModeEl.addEventListener("change", () => {
   renderModeHint();
 });
 
+// Render (and verify) only after storage is written, so the background reads
+// the new engine/key when the verification translation runs.
 engineEl.addEventListener("change", () => {
-  chrome.storage.local.set({ engine: engineEl.value });
-  renderEngine();
+  deeplBoxEl.style.display = engineEl.value === "deepl" ? "block" : "none";
+  geminiBoxEl.style.display = engineEl.value === "gemini" ? "block" : "none";
+  chrome.storage.local.set({ engine: engineEl.value }, renderEngineNow);
 });
 
 deeplKeyEl.addEventListener("change", () => {
-  chrome.storage.local.set({ deeplKey: deeplKeyEl.value.trim() });
-  renderEngineNow();
+  chrome.storage.local.set({ deeplKey: deeplKeyEl.value.trim() }, renderEngineNow);
 });
 
 geminiKeyEl.addEventListener("change", () => {
-  chrome.storage.local.set({ geminiKey: geminiKeyEl.value.trim() });
-  renderEngineNow();
+  chrome.storage.local.set({ geminiKey: geminiKeyEl.value.trim() }, renderEngineNow);
 });
