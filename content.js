@@ -18,9 +18,21 @@
     autoSend: false,
     translateReplies: true,
     replyMode: "hybrid", // "hybrid" | "overlay" | "append"
+    engine: "google", // mirrored only to tailor the failure hint
+    deeplKey: "",
+    geminiKey: "",
     from: "zh-CN",
     to: "en",
   };
+
+  // A keyed engine is actually in use (vs. Google, which needs no key). Used to
+  // decide whether a translation failure is worth pointing at the key.
+  function usingKeyedEngine() {
+    return (
+      (settings.engine === "deepl" && settings.deeplKey) ||
+      (settings.engine === "gemini" && settings.geminiKey)
+    );
+  }
 
   // pendingConfirm: we have already translated and are waiting for the user to
   // press Enter again (or click send) to actually send the English text.
@@ -513,7 +525,9 @@
   function flashOutError() {
     const n = outNode();
     n.className = "zer-warn";
-    n.textContent = "回复翻译失败 · 点此重试";
+    n.textContent = usingKeyedEngine()
+      ? "回复翻译失败 · 点此重试（或在面板查 Key）"
+      : "回复翻译失败 · 点此重试";
     n.style.display = "block";
     n.onclick = () => {
       n.style.display = "none";
