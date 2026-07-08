@@ -63,6 +63,8 @@ Create a claude.ai Project with the custom instruction `Always reply in English`
 
 Google is the default and needs no setup. Two optional engines give higher quality if you add a free API key — pick them in the popup under **Advanced**. Every key is stored locally in your browser and sent only to that provider.
 
+<img src="assets/popup.png" alt="Extension popup showing the Advanced engine selector" width="320">
+
 | Engine | Setup | Best for |
 | --- | --- | --- |
 | **Google** | None (default) | Everyday use. Free, works out of the box; unofficial, may occasionally rate-limit. |
