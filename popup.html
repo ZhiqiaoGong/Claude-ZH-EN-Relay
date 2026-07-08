@@ -147,6 +147,29 @@
       a {
         color: var(--accent);
       }
+      .adv {
+        margin-top: 10px;
+      }
+      .adv > summary {
+        cursor: pointer;
+        color: var(--muted);
+        font-size: 12px;
+        padding: 4px 2px;
+        list-style: none;
+        user-select: none;
+      }
+      .adv > summary::-webkit-details-marker {
+        display: none;
+      }
+      .adv > summary::before {
+        content: "▸ ";
+      }
+      .adv[open] > summary::before {
+        content: "▾ ";
+      }
+      .adv .card {
+        margin-top: 6px;
+      }
       .hint {
         margin: 12px 2px 0;
         color: var(--muted);
@@ -202,24 +225,40 @@
         </select>
       </div>
       <p class="submode" id="modeHint"></p>
-
-      <div class="row select-row">
-        <span class="label">翻译引擎</span>
-        <select id="engine">
-          <option value="google">Google（默认）</option>
-          <option value="deepl">DeepL</option>
-        </select>
-      </div>
-      <div id="deeplBox" style="display: none">
-        <input type="password" id="deeplKey" placeholder="DeepL API Key" />
-        <p class="submode">
-          DeepL 翻译质量更好，尤其技术内容。<b>未填 key 时仍用 Google。</b>免费
-          key 每月 50 万字符，<a href="https://www.deepl.com/pro-api" target="_blank"
-            >在此申请</a
-          >。
-        </p>
-      </div>
     </div>
+
+    <details class="adv" id="adv">
+      <summary>高级 · 翻译引擎</summary>
+      <div class="card">
+        <div class="row">
+          <span class="label">翻译引擎</span>
+          <select id="engine">
+            <option value="google">Google（默认，免 key）</option>
+            <option value="deepl">DeepL</option>
+            <option value="gemini">Gemini</option>
+          </select>
+        </div>
+        <div id="deeplBox" style="display: none">
+          <input type="password" id="deeplKey" placeholder="DeepL API Key" />
+          <p class="submode">
+            机翻，质量更好，尤其技术内容。<b>未填 key 时仍用 Google。</b>免费 key
+            每月 50 万字符，<a href="https://www.deepl.com/pro-api" target="_blank"
+              >在此申请</a
+            >。
+          </p>
+        </div>
+        <div id="geminiBox" style="display: none">
+          <input type="password" id="geminiKey" placeholder="Gemini API Key" />
+          <p class="submode">
+            大模型翻译，读上下文、更懂语气。<b>未填 key 时仍用 Google。</b>有免费额度，<a
+              href="https://aistudio.google.com/apikey"
+              target="_blank"
+              >在此申请</a
+            >。
+          </p>
+        </div>
+      </div>
+    </details>
 
     <p class="hint">
       输入中文，回车后自动译为英文发送。<br />

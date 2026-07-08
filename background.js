@@ -87,14 +87,72 @@ async function deeplTranslateBatch(texts, from, to, key) {
   }
 }
 
+function langName(code) {
+  return String(code).toLowerCase().startsWith("zh") ? "Chinese" : "English";
+}
+
+// Translate a batch through Google's Gemini (an LLM), which reads context and
+// is strong on technical text. We ask for a JSON array back and validate its
+// shape; anything unexpected throws so the caller retries.
+async function geminiTranslateBatch(texts, from, to, key) {
+  const prompt =
+    `Translate each string in the following JSON array to ${langName(to)}. ` +
+    "Return ONLY a JSON array of the translated strings, same length and order. " +
+    "Keep code, identifiers, and URLs unchanged. No markdown, no explanation.\n" +
+    JSON.stringify(texts);
+
+  const url =
+    "https://generativelanguage.googleapis.com/v1beta/models/" +
+    "gemini-2.0-flash:generateContent?key=" +
+    encodeURIComponent(key.trim());
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0 },
+      }),
+      signal: ctrl.signal,
+    });
+    if (!res.ok) throw new Error("gemini HTTP " + res.status);
+    const data = await res.json();
+    let text =
+      (data.candidates &&
+        data.candidates[0] &&
+        data.candidates[0].content &&
+        data.candidates[0].content.parts[0].text) ||
+      "";
+    text = text
+      .trim()
+      .replace(/^```(?:json)?\s*/i, "")
+      .replace(/```\s*$/, "")
+      .trim();
+    const arr = JSON.parse(text);
+    if (!Array.isArray(arr) || arr.length !== texts.length) {
+      throw new Error("gemini bad shape");
+    }
+    return arr.map((s) => (typeof s === "string" ? s : null));
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // Pick the engine per the user's settings and translate a batch of strings.
 async function translateBatch(texts, from, to) {
-  const { engine = "google", deeplKey = "" } = await chrome.storage.local.get([
-    "engine",
-    "deeplKey",
-  ]);
+  const {
+    engine = "google",
+    deeplKey = "",
+    geminiKey = "",
+  } = await chrome.storage.local.get(["engine", "deeplKey", "geminiKey"]);
   if (engine === "deepl" && deeplKey.trim()) {
     return deeplTranslateBatch(texts, from, to, deeplKey);
+  }
+  if (engine === "gemini" && geminiKey.trim()) {
+    return geminiTranslateBatch(texts, from, to, geminiKey);
   }
   return googleTranslateBatch(texts, from, to);
 }

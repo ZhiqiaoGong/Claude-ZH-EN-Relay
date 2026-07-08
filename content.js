@@ -37,15 +37,17 @@
     for (const key of Object.keys(changes)) {
       if (key in settings) settings[key] = changes[key].newValue;
     }
-    // Changing the engine or key invalidates cached translations.
-    if ("engine" in changes || "deeplKey" in changes) trCache.clear();
+    // Changing the engine or a key invalidates cached translations.
+    if ("engine" in changes || "deeplKey" in changes || "geminiKey" in changes)
+      trCache.clear();
 
     // Re-render existing replies when the layout, toggle, or engine changes.
     if (
       "replyMode" in changes ||
       "translateReplies" in changes ||
       "engine" in changes ||
-      "deeplKey" in changes
+      "deeplKey" in changes ||
+      "geminiKey" in changes
     ) {
       resetTranslations();
       if (settings.enabled && settings.translateReplies) {

@@ -35,7 +35,7 @@ Switch reply layout modes on the fly:
 - **Your text goes to Google Translate.** Input and replies are sent to Google's translation service to be translated. Don't route anything sensitive through it. Details in [PRIVACY.md](PRIVACY.md).
 - **Machine translation isn't perfect,** especially around jargon and code. The input side is guarded by the review pause; on the reply side, click through to the original or use select-to-translate.
 - **It rides on claude.ai's page structure.** A major redesign may break input interception or reply detection until the selectors are updated.
-- **The default engine is unofficial.** Google's free translate endpoint needs no key but can rate-limit or break. For higher quality, switch to DeepL in the popup (free key, better with technical text).
+- **The default engine is unofficial.** Google's free translate endpoint needs no key but can rate-limit or break. For higher quality, add a DeepL or Gemini key (see [Translation engines](#translation-engines)).
 - **Unaffiliated personal tool.** Not affiliated with Anthropic or Google. Use at your own risk.
 
 ## Install
@@ -57,7 +57,19 @@ Create a claude.ai Project with the custom instruction `Always reply in English`
 - **Auto-send after translation** — off: pause for review; on: send immediately.
 - **Translate replies to Chinese** — toggle the reply side.
 - **Reply layout** — Hybrid (recommended) / Full bilingual / Plain text only.
-- **Translation engine** — Google (default, no key) or DeepL (free key, better quality).
+- **Translation engine** (under "Advanced") — see below.
+
+## Translation engines
+
+Google is the default and needs no setup. Two optional engines give higher quality if you add a free API key — pick them in the popup under **Advanced**. Every key is stored locally in your browser and sent only to that provider.
+
+| Engine | Setup | Best for |
+| --- | --- | --- |
+| **Google** | None (default) | Everyday use. Free, works out of the box; unofficial, may occasionally rate-limit. |
+| **DeepL** | Free API key | Higher-quality machine translation, especially technical text. |
+| **Gemini** | Free API key | LLM translation that reads context and tone. |
+
+Without a key, DeepL and Gemini both fall back to Google, so nothing breaks.
 
 ## License
 
