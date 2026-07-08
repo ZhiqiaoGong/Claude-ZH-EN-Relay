@@ -2,19 +2,25 @@
 
 English | [中文](README.zh-CN.md)
 
-A Chrome extension for claude.ai: chat in Chinese, send in English, save your usage quota.
-
-Chinese text typically costs 1.5–2x more tokens than the equivalent English. This extension translates your Chinese input to English right before it is sent, and translates English replies back to Chinese for reading — so the entire conversation context stays in compact English, stretching a Pro/Max usage limit noticeably on long conversations.
-
-Every translation is visible and reversible. The extension never touches network traffic; it only edits text on the page, the same way writing assistants and translation extensions do.
+Chat with claude.ai in Chinese, send in English, save your usage quota.
 
 ![Type Chinese, send English, read the reply back in Chinese](assets/demo-main.gif)
 
-## How it works
+## Why
 
-- **Input side**: type Chinese in the normal input box and press Enter. The text is translated to English in place, and by default the send pauses so the English can be reviewed — this doubles as the safeguard against silent mistranslation. Confirm with Enter, or press Esc to restore the Chinese.
-- **Reply side**: once a reply finishes rendering, its English is translated back to Chinese. Three layout modes (see below).
-- **Select to translate**: select any text in a reply for an instant popup translation, direction auto-detected. Useful for double-checking technical passages.
+On Claude, the same sentence in Chinese costs roughly 1.5–2x the tokens of its English equivalent. On a Pro or Max plan your usage limit is spent in tokens, so Chinese conversations burn through it faster and hit the cap sooner.
+
+Yifa lets you keep typing Chinese while Claude receives English, and reads back in Chinese, so the whole conversation stays in compact English under the hood. On long chats that means noticeably more usage before you hit the limit.
+
+## What makes it different
+
+Ordinary translation extensions only translate what is shown on the page. They never change what you send. Yifa works on the message itself:
+
+- **Sends English, not Chinese.** Your input is translated to English before it leaves the box, so the model receives the compact English. This is the part a normal translator cannot do.
+- **Review before send.** The English appears in the box first. Press Enter to send, Esc to undo. A bad translation gets caught before the model ever sees it.
+- **Replies back in Chinese, three layouts.** Hybrid (default) replaces plain text in place and leaves code blocks and inline code untouched; full bilingual; or plain-text only.
+- **Select to translate.** Highlight any text for an instant popup, direction auto-detected.
+- **Never touches your traffic.** It only edits text on the page, the way a writing assistant does. No network interception, no server of its own.
 
 Select any text for an instant translation:
 
@@ -37,7 +43,7 @@ Works on Chromium-based browsers (Chrome, Edge, etc.).
 
 The extension translates your input, but it cannot decide which language the model replies in. To maximize quota savings, make the replies English too:
 
-Create a claude.ai Project with the custom instruction `Always reply in English`, and chat inside that Project. Replies come back in English, the extension renders them in Chinese, and the whole context stays compact — the longer the conversation, the more it saves.
+Create a claude.ai Project with the custom instruction `Always reply in English`, and chat inside that Project. Replies come back in English, the extension renders them in Chinese, and the whole context stays compact. The longer the conversation, the more it saves.
 
 ## Settings (toolbar popup)
 
