@@ -1,6 +1,26 @@
 // Service worker: performs cross-origin translation calls on behalf of the
 // content script. Routing fetch through the background avoids CORS issues and
-// keeps the DeepL API key out of the page context.
+// keeps API keys out of the page context.
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// fetch with a timeout and one retry on rate-limit / server errors (429, 5xx).
+async function fetchWithRetry(url, opts, timeoutMs) {
+  for (let attempt = 0; ; attempt++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { ...opts, signal: ctrl.signal });
+      if ((res.status === 429 || res.status >= 500) && attempt === 0) {
+        await sleep(700);
+        continue;
+      }
+      return res;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+}
 
 // Translate text using Google's unofficial gtx endpoint. No API key required,
 // but it is unofficial and may rate-limit or break.
@@ -12,21 +32,14 @@ async function googleTranslate(text, from, to) {
     "&tl=" + encodeURIComponent(to) +
     "&dt=t&q=" + encodeURIComponent(text);
 
-  // Time out the request so a slow/hung endpoint never stalls the caller.
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 10000);
-  try {
-    const res = await fetch(url, { signal: ctrl.signal });
-    if (!res.ok) throw new Error("translate HTTP " + res.status);
-    const data = await res.json();
-    // Response shape: [[[translatedSegment, originalSegment, ...], ...], ...].
-    if (!Array.isArray(data) || !Array.isArray(data[0])) {
-      throw new Error("unexpected translate response");
-    }
-    return data[0].map((seg) => (seg && seg[0]) || "").join("");
-  } finally {
-    clearTimeout(timer);
+  const res = await fetchWithRetry(url, {}, 10000);
+  if (!res.ok) throw new Error("translate HTTP " + res.status);
+  const data = await res.json();
+  // Response shape: [[[translatedSegment, originalSegment, ...], ...], ...].
+  if (!Array.isArray(data) || !Array.isArray(data[0])) {
+    throw new Error("unexpected translate response");
   }
+  return data[0].map((seg) => (seg && seg[0]) || "").join("");
 }
 
 // Translate a list of strings sequentially (gentle on the unofficial endpoint).
@@ -67,24 +80,46 @@ async function deeplTranslateBatch(texts, from, to, key) {
   params.append("source_lang", toDeepL(from));
   params.append("target_lang", toDeepL(to));
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 10000);
-  try {
-    const res = await fetch(base + "/v2/translate", {
+  const res = await fetchWithRetry(
+    base + "/v2/translate",
+    {
       method: "POST",
       headers: {
         Authorization: "DeepL-Auth-Key " + k,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: params.toString(),
-      signal: ctrl.signal,
-    });
-    if (!res.ok) throw new Error("deepl HTTP " + res.status);
-    const data = await res.json();
-    return data.translations.map((t) => t.text);
-  } finally {
-    clearTimeout(timer);
+    },
+    10000
+  );
+  if (!res.ok) throw new Error("deepl HTTP " + res.status);
+  const data = await res.json();
+  return data.translations.map((t) => t.text);
+}
+
+// Pull a JSON array of length n out of an LLM response, tolerating markdown
+// fences or stray prose around it.
+function parseJsonArray(text, n) {
+  let s = text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/```\s*$/, "")
+    .trim();
+  const tries = [s];
+  const a = s.indexOf("[");
+  const b = s.lastIndexOf("]");
+  if (a !== -1 && b > a) tries.push(s.slice(a, b + 1));
+  for (const t of tries) {
+    try {
+      const arr = JSON.parse(t);
+      if (Array.isArray(arr) && arr.length === n) {
+        return arr.map((x) => (typeof x === "string" ? x : null));
+      }
+    } catch (e) {
+      /* try the next candidate */
+    }
   }
+  return null;
 }
 
 function langName(code) {
@@ -106,39 +141,29 @@ async function geminiTranslateBatch(texts, from, to, key) {
     "gemini-2.0-flash:generateContent?key=" +
     encodeURIComponent(key.trim());
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 20000);
-  try {
-    const res = await fetch(url, {
+  const res = await fetchWithRetry(
+    url,
+    {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: { temperature: 0 },
       }),
-      signal: ctrl.signal,
-    });
-    if (!res.ok) throw new Error("gemini HTTP " + res.status);
-    const data = await res.json();
-    let text =
-      (data.candidates &&
-        data.candidates[0] &&
-        data.candidates[0].content &&
-        data.candidates[0].content.parts[0].text) ||
-      "";
-    text = text
-      .trim()
-      .replace(/^```(?:json)?\s*/i, "")
-      .replace(/```\s*$/, "")
-      .trim();
-    const arr = JSON.parse(text);
-    if (!Array.isArray(arr) || arr.length !== texts.length) {
-      throw new Error("gemini bad shape");
-    }
-    return arr.map((s) => (typeof s === "string" ? s : null));
-  } finally {
-    clearTimeout(timer);
-  }
+    },
+    20000
+  );
+  if (!res.ok) throw new Error("gemini HTTP " + res.status);
+  const data = await res.json();
+  const text =
+    (data.candidates &&
+      data.candidates[0] &&
+      data.candidates[0].content &&
+      data.candidates[0].content.parts[0].text) ||
+    "";
+  const arr = parseJsonArray(text, texts.length);
+  if (!arr) throw new Error("gemini parse");
+  return arr;
 }
 
 // Pick the engine per the user's settings and translate a batch of strings.

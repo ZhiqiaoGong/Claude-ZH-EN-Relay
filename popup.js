@@ -21,6 +21,7 @@ const deeplKeyEl = document.getElementById("deeplKey");
 const geminiBoxEl = document.getElementById("geminiBox");
 const geminiKeyEl = document.getElementById("geminiKey");
 const advEl = document.getElementById("adv");
+const engineNowEl = document.getElementById("engineNow");
 
 const MODE_HINTS = {
   hybrid: "纯文字段落就地替换，点击可看原文；含代码或链接的段落在下方附译文。",
@@ -35,6 +36,23 @@ function renderModeHint() {
 function renderEngine() {
   deeplBoxEl.style.display = engineEl.value === "deepl" ? "block" : "none";
   geminiBoxEl.style.display = engineEl.value === "gemini" ? "block" : "none";
+  renderEngineNow();
+}
+
+// Show which engine is actually in effect — a chosen engine with no key
+// silently falls back to Google, and this is where the user finds that out.
+function renderEngineNow() {
+  const e = engineEl.value;
+  const name = { google: "Google", deepl: "DeepL", gemini: "Gemini" }[e];
+  const hasKey =
+    e === "deepl"
+      ? !!deeplKeyEl.value.trim()
+      : e === "gemini"
+      ? !!geminiKeyEl.value.trim()
+      : true;
+  engineNowEl.textContent = hasKey
+    ? "当前生效：" + name
+    : "当前生效：Google（" + name + " 未填 key，已回退）";
 }
 
 chrome.storage.local.get(DEFAULTS, (s) => {
@@ -74,8 +92,10 @@ engineEl.addEventListener("change", () => {
 
 deeplKeyEl.addEventListener("change", () => {
   chrome.storage.local.set({ deeplKey: deeplKeyEl.value.trim() });
+  renderEngineNow();
 });
 
 geminiKeyEl.addEventListener("change", () => {
   chrome.storage.local.set({ geminiKey: geminiKeyEl.value.trim() });
+  renderEngineNow();
 });

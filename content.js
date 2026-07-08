@@ -427,8 +427,14 @@
   }
 
   // Cache of reply translations (English -> Chinese) so re-rendering after a
-  // layout-mode switch is instant and never re-hits the network.
+  // layout-mode switch is instant and never re-hits the network. Capped so a
+  // long session cannot grow it without bound (oldest entries drop first).
   const trCache = new Map();
+  const TR_CACHE_CAP = 2000;
+  function cacheSet(k, v) {
+    trCache.set(k, v);
+    if (trCache.size > TR_CACHE_CAP) trCache.delete(trCache.keys().next().value);
+  }
   async function cachedTranslateBatch(texts) {
     const out = new Array(texts.length);
     const missIdx = [];
@@ -445,7 +451,7 @@
       if (!got) return null; // network failure: signal a retry
       got.forEach((v, j) => {
         out[missIdx[j]] = v;
-        if (v != null) trCache.set(missTexts[j], v);
+        if (v != null) cacheSet(missTexts[j], v);
       });
     }
     return out;
