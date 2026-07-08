@@ -526,7 +526,7 @@
     const n = outNode();
     n.className = "zer-warn";
     n.textContent = usingKeyedEngine()
-      ? "回复翻译失败 · 点此重试（或检查 API Key）"
+      ? "回复翻译失败 · 点此重试；如持续失败请检查引擎设置"
       : "回复翻译失败 · 点此重试";
     n.style.display = "block";
     n.onclick = () => {
