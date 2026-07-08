@@ -35,7 +35,7 @@ Switch reply layout modes on the fly:
 - **Your text goes to Google Translate.** Input and replies are sent to Google's translation service to be translated. Don't route anything sensitive through it. Details in [PRIVACY.md](PRIVACY.md).
 - **Machine translation isn't perfect,** especially around jargon and code. The input side is guarded by the review pause; on the reply side, click through to the original or use select-to-translate.
 - **It rides on claude.ai's page structure.** A major redesign may break input interception or reply detection until the selectors are updated.
-- **The default engine is unofficial.** Google's free translate endpoint can rate-limit or break; a keyed DeepL option is planned.
+- **The default engine is unofficial.** Google's free translate endpoint needs no key but can rate-limit or break. For higher quality, switch to DeepL in the popup (free key, better with technical text).
 - **Unaffiliated personal tool.** Not affiliated with Anthropic or Google. Use at your own risk.
 
 ## Install
@@ -57,6 +57,7 @@ Create a claude.ai Project with the custom instruction `Always reply in English`
 - **Auto-send after translation** — off: pause for review; on: send immediately.
 - **Translate replies to Chinese** — toggle the reply side.
 - **Reply layout** — Hybrid (recommended) / Full bilingual / Plain text only.
+- **Translation engine** — Google (default, no key) or DeepL (free key, better quality).
 
 ## License
 

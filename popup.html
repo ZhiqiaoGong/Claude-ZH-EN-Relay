@@ -134,6 +134,19 @@
         font-size: 11.5px;
         line-height: 1.5;
       }
+      input[type="password"] {
+        width: 100%;
+        font-size: 13px;
+        color: var(--text);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 7px 9px;
+        margin: 4px 0 6px;
+      }
+      a {
+        color: var(--accent);
+      }
       .hint {
         margin: 12px 2px 0;
         color: var(--muted);
@@ -189,6 +202,24 @@
         </select>
       </div>
       <p class="submode" id="modeHint"></p>
+
+      <div class="row select-row">
+        <span class="label">翻译引擎</span>
+        <select id="engine">
+          <option value="google">Google（默认）</option>
+          <option value="deepl">DeepL</option>
+        </select>
+      </div>
+      <div id="deeplBox" style="display: none">
+        <input type="password" id="deeplKey" placeholder="DeepL API Key" />
+        <p class="submode">
+          DeepL 翻译质量更好，尤其技术内容。免费 key 每月 50 万字符，<a
+            href="https://www.deepl.com/pro-api"
+            target="_blank"
+            >在此申请</a
+          >。
+        </p>
+      </div>
     </div>
 
     <p class="hint">
