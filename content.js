@@ -416,6 +416,31 @@
     );
   }
 
+  // Cache of reply translations (English -> Chinese) so re-rendering after a
+  // layout-mode switch is instant and never re-hits the network.
+  const trCache = new Map();
+  async function cachedTranslateBatch(texts) {
+    const out = new Array(texts.length);
+    const missIdx = [];
+    const missTexts = [];
+    texts.forEach((t, i) => {
+      if (trCache.has(t)) out[i] = trCache.get(t);
+      else {
+        missIdx.push(i);
+        missTexts.push(t);
+      }
+    });
+    if (missTexts.length) {
+      const got = await translateBatch(missTexts);
+      if (!got) return null; // network failure: signal a retry
+      got.forEach((v, j) => {
+        out[missIdx[j]] = v;
+        if (v != null) trCache.set(missTexts[j], v);
+      });
+    }
+    return out;
+  }
+
   async function translateReply(el) {
     if (contextInvalid || el.hasAttribute(DONE_ATTR)) return;
 
@@ -433,7 +458,7 @@
     const texts = items.map((it) => it.node.textContent.trim());
     outInFlight++;
     updateOutStatus();
-    const out = await translateBatch(texts);
+    const out = await cachedTranslateBatch(texts);
     outInFlight--;
     updateOutStatus();
     if (!out) {
@@ -480,16 +505,36 @@
     };
   }
 
-  // Consider a reply "finished" when it has stopped mutating for a beat.
+  // claude.ai marks the still-generating turn with data-is-streaming="true".
+  function isStreaming(el) {
+    const s = el.closest("[data-is-streaming]");
+    return s ? s.getAttribute("data-is-streaming") === "true" : false;
+  }
+
+  // Translate once the reply is done: while it is still streaming just check
+  // back; when it settles, translate after a short beat. Faster and more
+  // reliable than waiting out a fixed pause after the last mutation.
   function scheduleReply(el) {
     if (el.hasAttribute(DONE_ATTR)) return;
     clearTimeout(settleTimers.get(el));
-    settleTimers.set(el, setTimeout(() => translateReply(el), 1500));
+    settleTimers.set(
+      el,
+      setTimeout(() => {
+        if (isStreaming(el)) scheduleReply(el);
+        else translateReply(el);
+      }, isStreaming(el) ? 600 : 400)
+    );
   }
 
   const replyObserver = new MutationObserver((muts) => {
     if (!settings.enabled || !settings.translateReplies) return;
     for (const m of muts) {
+      if (m.type === "attributes") {
+        // the streaming flag flipped: (re)check replies inside this turn
+        m.target.querySelectorAll &&
+          m.target.querySelectorAll(REPLY_SEL).forEach(scheduleReply);
+        continue;
+      }
       const reply = findReply(m.target);
       if (reply) scheduleReply(reply);
     }
@@ -498,6 +543,8 @@
     subtree: true,
     childList: true,
     characterData: true,
+    attributes: true,
+    attributeFilter: ["data-is-streaming"],
   });
 
   // Initial sweep for replies already on the page at load.
@@ -538,17 +585,19 @@
     }
   }
 
-  function placeAt(node, rect) {
-    node.style.left = Math.min(rect.right, window.innerWidth - 40) + "px";
-    node.style.top = rect.bottom + 8 + "px";
+  // Anchor floating UI to the cursor (mouse-release point) rather than to the
+  // selection box, so it stays clear of claude.ai's own selection tooltip.
+  function placeAt(node, x, y, w) {
+    node.style.left = Math.max(4, Math.min(x, window.innerWidth - w - 4)) + "px";
+    node.style.top = y + "px";
   }
 
-  function openPopup(rect, text) {
+  function openPopup(x, y, text) {
     const toZh = !CJK_RE.test(text);
     selPopup = document.createElement("div");
     selPopup.id = "zer-popup";
     selPopup.textContent = "翻译中…";
-    placeAt(selPopup, rect);
+    placeAt(selPopup, x, y, 360);
     document.body.appendChild(selPopup);
 
     sendWithTimeout(
@@ -575,18 +624,20 @@
   document.addEventListener("mouseup", (e) => {
     if (!settings.enabled) return;
     if (e.target.closest && e.target.closest("#zer-pill, #zer-popup")) return;
+    // pill sits just below-right of where the mouse was released
+    const px = e.clientX + 8;
+    const py = e.clientY + 12;
     // let the selection settle after the mouseup
     setTimeout(() => {
       const sel = window.getSelection();
       const text = sel && sel.toString().trim();
       removeSelUI();
       if (!text || text.length < 2) return;
-      const rect = sel.getRangeAt(0).getBoundingClientRect();
 
       selPill = document.createElement("div");
       selPill.id = "zer-pill";
       selPill.textContent = "译";
-      placeAt(selPill, rect);
+      placeAt(selPill, px, py, 24);
       document.body.appendChild(selPill);
 
       // keep the selection alive when pressing the pill
@@ -596,7 +647,7 @@
           selPill.remove();
           selPill = null;
         }
-        openPopup(rect, text);
+        openPopup(px, py, text);
       });
     }, 10);
   });
