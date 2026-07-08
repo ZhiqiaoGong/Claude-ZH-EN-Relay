@@ -8,11 +8,21 @@ Chinese text typically costs 1.5–2x more tokens than the equivalent English. T
 
 Every translation is visible and reversible. The extension never touches network traffic; it only edits text on the page, the same way writing assistants and translation extensions do.
 
+![Type Chinese, send English, read the reply back in Chinese](assets/demo-main.gif)
+
 ## How it works
 
 - **Input side**: type Chinese in the normal input box and press Enter. The text is translated to English in place, and by default the send pauses so the English can be reviewed — this doubles as the safeguard against silent mistranslation. Confirm with Enter, or press Esc to restore the Chinese.
 - **Reply side**: once a reply finishes rendering, its English is translated back to Chinese. Three layout modes (see below).
 - **Select to translate**: select any text in a reply for an instant popup translation, direction auto-detected. Useful for double-checking technical passages.
+
+Select any text for an instant translation:
+
+![Select to translate](assets/demo-select.gif)
+
+Switch reply layout modes on the fly:
+
+![Reply layout modes](assets/demo-modes.gif)
 
 ## Install
 

@@ -127,8 +127,20 @@
   }
 
   // ---- translation -------------------------------------------------------
-  // Send a message to the background and always settle: on reply, on error, or
-  // after a timeout — so a dead service worker never leaves callers hanging.
+  // True once the extension has been reloaded/updated out from under this
+  // (now orphaned) content script. chrome.runtime then becomes unusable.
+  let contextInvalid = false;
+  function markContextInvalid() {
+    if (contextInvalid) return;
+    contextInvalid = true;
+    outInFlight = 0;
+    updateOutStatus();
+    showBar("译发已更新或重载 · 请刷新此页面", "zer-warn");
+  }
+
+  // Send a message to the background and always settle: on reply, on error,
+  // after a timeout, or if the extension context is gone — so a dead worker or
+  // an orphaned content script never leaves callers hanging (or throws).
   function sendWithTimeout(msg, ms, onResp) {
     return new Promise((resolve) => {
       let done = false;
@@ -138,12 +150,24 @@
           resolve(v);
         }
       };
+      // chrome.runtime.id is undefined once the context is invalidated.
+      if (!chrome.runtime || !chrome.runtime.id) {
+        markContextInvalid();
+        finish(null);
+        return;
+      }
       const timer = setTimeout(() => finish(null), ms);
-      chrome.runtime.sendMessage(msg, (resp) => {
+      try {
+        chrome.runtime.sendMessage(msg, (resp) => {
+          clearTimeout(timer);
+          if (chrome.runtime.lastError || !resp || !resp.ok) finish(null);
+          else finish(onResp(resp));
+        });
+      } catch (e) {
         clearTimeout(timer);
-        if (chrome.runtime.lastError || !resp || !resp.ok) finish(null);
-        else finish(onResp(resp));
-      });
+        markContextInvalid();
+        finish(null);
+      }
     });
   }
 
@@ -181,6 +205,11 @@
 
   // ---- core flow ---------------------------------------------------------
   async function handleSendIntent(editor, e) {
+    // Orphaned content script: don't block the send, just prompt a reload.
+    if (contextInvalid) {
+      markContextInvalid();
+      return;
+    }
     const text = getPlainText(editor);
     if (!text) return; // nothing to do, let it through
     if (!CJK_RE.test(text)) return; // already English, let it through
@@ -388,7 +417,7 @@
   }
 
   async function translateReply(el) {
-    if (el.hasAttribute(DONE_ATTR)) return;
+    if (contextInvalid || el.hasAttribute(DONE_ATTR)) return;
 
     // Decide per block, dropping any this mode leaves untouched, so we do not
     // waste translation calls on skipped paragraphs.
@@ -522,24 +551,25 @@
     placeAt(selPopup, rect);
     document.body.appendChild(selPopup);
 
-    chrome.runtime.sendMessage(
+    sendWithTimeout(
       {
         type: "translate",
         text,
         from: toZh ? "en" : "zh-CN",
         to: toZh ? "zh-CN" : "en",
       },
-      (resp) => {
-        if (!selPopup) return;
-        if (chrome.runtime.lastError || !resp || !resp.ok) {
-          selPopup.textContent = "翻译失败";
-          selPopup.className = "zer-fail";
-        } else {
-          selPopup.textContent = resp.text;
-          selPopup.className = "";
-        }
+      15000,
+      (resp) => resp.text
+    ).then((translated) => {
+      if (!selPopup) return;
+      if (translated == null) {
+        selPopup.textContent = "翻译失败";
+        selPopup.className = "zer-fail";
+      } else {
+        selPopup.textContent = translated;
+        selPopup.className = "";
       }
-    );
+    });
   }
 
   document.addEventListener("mouseup", (e) => {
