@@ -34,6 +34,45 @@
   background: #b7791f;
 }
 
+/* Review panel: your original Chinese (read-only) shown above the composer so
+   you can compare it with the English in the box before sending. */
+#zer-review {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: none;
+  max-width: min(90vw, 720px);
+  padding: 9px 14px;
+  border-radius: 12px;
+  color: #1a202c;
+  background: #fff;
+  border: 1px solid #cbd5e0;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16);
+  font-size: 14px;
+  line-height: 1.5;
+}
+#zer-review .zer-tag {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+  font-size: 11px;
+  vertical-align: 1px;
+}
+#zer-review .zer-tip {
+  margin-top: 5px;
+  color: #718096;
+  font-size: 12px;
+}
+#zer-review .zer-tip b {
+  color: #1a202c;
+  font-weight: 600;
+}
+
 /* Translated reply blocks: clickable to reveal the original. */
 .zer-tr {
   cursor: pointer;

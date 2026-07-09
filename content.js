@@ -158,6 +158,7 @@
     contextInvalid = true;
     outInFlight = 0;
     updateOutStatus();
+    hideReview();
     showBar("译发已更新或重载 · 请刷新此页面", "zer-warn");
   }
 
@@ -202,7 +203,18 @@
     );
   }
 
-  // ---- status bar --------------------------------------------------------
+  // ---- status bar + review panel -----------------------------------------
+  // Place a fixed element just above the composer so it never covers the input.
+  function positionAboveComposer(node, gap) {
+    const composer =
+      document.querySelector('[data-chat-input-container="true"]') ||
+      (activeEditor && activeEditor.closest("fieldset"));
+    if (composer) {
+      const r = composer.getBoundingClientRect();
+      node.style.bottom = window.innerHeight - r.top + (gap || 8) + "px";
+    }
+  }
+
   let barEl = null;
   function showBar(html, kind) {
     if (!barEl) {
@@ -213,17 +225,39 @@
     barEl.className = kind || "";
     barEl.innerHTML = html;
     barEl.style.display = "block";
-    // Sit just above the composer so it never covers the translated text.
-    const composer =
-      document.querySelector('[data-chat-input-container="true"]') ||
-      (activeEditor && activeEditor.closest("fieldset"));
-    if (composer) {
-      const r = composer.getBoundingClientRect();
-      barEl.style.bottom = window.innerHeight - r.top + 8 + "px";
-    }
+    positionAboveComposer(barEl, 8);
   }
   function hideBar() {
     if (barEl) barEl.style.display = "none";
+  }
+
+  // The review panel: while you check the English before sending, this shows the
+  // Chinese you typed (read-only, not sent) so you can compare side by side.
+  let reviewEl = null;
+  function showReview(original) {
+    if (!reviewEl) {
+      reviewEl = document.createElement("div");
+      reviewEl.id = "zer-review";
+      document.body.appendChild(reviewEl);
+    }
+    reviewEl.textContent = "";
+    const orig = document.createElement("div");
+    orig.className = "zer-orig";
+    const tag = document.createElement("span");
+    tag.className = "zer-tag";
+    tag.textContent = "原文";
+    orig.appendChild(tag);
+    orig.appendChild(document.createTextNode(original));
+    const tip = document.createElement("div");
+    tip.className = "zer-tip";
+    tip.innerHTML = "<b>回车</b> 发送 · <b>Esc</b> 撤回";
+    reviewEl.appendChild(orig);
+    reviewEl.appendChild(tip);
+    reviewEl.style.display = "block";
+    positionAboveComposer(reviewEl, 8);
+  }
+  function hideReview() {
+    if (reviewEl) reviewEl.style.display = "none";
   }
 
   // ---- core flow ---------------------------------------------------------
@@ -268,7 +302,8 @@
     }
 
     pendingConfirm = true;
-    showBar("已译为英文 · <b>回车</b>发送 · <b>Esc</b> 撤回", "zer-ok");
+    hideBar();
+    showReview(originalText);
   }
 
   function restoreOriginal(editor) {
@@ -276,6 +311,7 @@
     originalText = "";
     pendingConfirm = false;
     hideBar();
+    hideReview();
   }
 
   // ---- keep your own bubbles readable ------------------------------------
@@ -318,6 +354,7 @@
         // Second Enter: user confirmed. Let claude.ai send the English text.
         pendingConfirm = false;
         hideBar();
+        hideReview();
         return;
       }
 
@@ -330,11 +367,19 @@
   document.addEventListener(
     "click",
     (e) => {
-      if (!settings.enabled || pendingConfirm) return;
+      if (!settings.enabled) return;
       const btn = e.target.closest && e.target.closest("button");
       if (!btn) return;
       const label = (btn.getAttribute("aria-label") || "").toLowerCase();
       if (!label.includes("send")) return;
+
+      if (pendingConfirm) {
+        // clicking send confirms the reviewed English; let it through
+        pendingConfirm = false;
+        hideBar();
+        hideReview();
+        return;
+      }
 
       const editor = activeEditor || getEditor(document.activeElement);
       if (!editor) return;
