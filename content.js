@@ -213,15 +213,29 @@
     return 0.2126 * r + 0.7152 * g + 0.0722 * b < 128;
   }
 
-  // Place a fixed element just above the composer so it never covers the input.
-  function positionAboveComposer(node, gap) {
-    const composer =
+  // Mark the whole page so our injected UI (panels and in-place annotations
+  // alike) can adapt to claude's theme. Re-runs when claude flips its theme.
+  function applyTheme() {
+    document.documentElement.classList.toggle("zer-dark", pageIsDark());
+  }
+  new MutationObserver(applyTheme).observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class", "style", "data-mode", "data-theme"],
+  });
+  applyTheme();
+
+  function getComposerRect() {
+    const c =
       document.querySelector('[data-chat-input-container="true"]') ||
       (activeEditor && activeEditor.closest("fieldset"));
-    if (composer) {
-      const r = composer.getBoundingClientRect();
-      node.style.bottom = window.innerHeight - r.top + (gap || 8) + "px";
-    }
+    return c ? c.getBoundingClientRect() : null;
+  }
+
+  // Place a fixed element just above the composer so it never covers the input.
+  function positionAboveComposer(node, gap) {
+    const r = getComposerRect();
+    if (r) node.style.bottom = window.innerHeight - r.top + (gap || 8) + "px";
+    return r;
   }
 
   let barEl = null;
@@ -252,15 +266,23 @@
     reviewEl.textContent = "";
     const orig = document.createElement("div");
     orig.className = "zer-orig";
-    orig.textContent = original;
+    const lbl = document.createElement("span");
+    lbl.className = "zer-lbl";
+    lbl.textContent = "原文：";
+    orig.appendChild(lbl);
+    orig.appendChild(document.createTextNode(original));
     const tip = document.createElement("div");
     tip.className = "zer-tip";
     tip.innerHTML = "<b>回车</b> 发送 · <b>Esc</b> 撤回";
     reviewEl.appendChild(orig);
     reviewEl.appendChild(tip);
-    reviewEl.classList.toggle("zer-dark", pageIsDark());
     reviewEl.style.display = "block";
-    positionAboveComposer(reviewEl, 8);
+    // Left-align the panel with the composer instead of centering it.
+    const r = positionAboveComposer(reviewEl, 8);
+    if (r) {
+      reviewEl.style.left = r.left + "px";
+      reviewEl.style.transform = "none";
+    }
   }
   function hideReview() {
     if (reviewEl) reviewEl.style.display = "none";
@@ -742,7 +764,6 @@
     const toZh = !CJK_RE.test(text);
     selPopup = document.createElement("div");
     selPopup.id = "zer-popup";
-    selPopup.classList.toggle("zer-dark", pageIsDark());
     selPopup.textContent = "翻译中…";
     placeAt(selPopup, x, y, 360);
     document.body.appendChild(selPopup);

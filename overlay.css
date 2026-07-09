@@ -60,6 +60,9 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+#zer-review .zer-lbl {
+  color: #8a8f99;
+}
 #zer-review .zer-tip {
   margin-top: 4px;
   color: #8a8f99;
@@ -69,25 +72,32 @@
   color: #3a3d47;
   font-weight: 600;
 }
-#zer-review.zer-dark {
+.zer-dark #zer-review {
   border-left-color: rgba(129, 140, 248, 0.75);
   background: #2b2c31;
   color: #d4d6db;
 }
-#zer-review.zer-dark .zer-tip {
+.zer-dark #zer-review .zer-lbl,
+.zer-dark #zer-review .zer-tip {
   color: #9aa0a8;
 }
-#zer-review.zer-dark .zer-tip b {
+.zer-dark #zer-review .zer-tip b {
   color: #d4d6db;
 }
 
 /* Translated reply blocks: clickable to reveal the original. */
 .zer-tr {
   cursor: pointer;
-  border-bottom: 1px dashed rgba(99, 102, 241, 0.45);
+  border-bottom: 1px dashed rgba(99, 102, 241, 0.5);
 }
 .zer-tr[data-zer-showing="orig"] {
-  border-bottom-color: rgba(99, 102, 241, 0.2);
+  border-bottom-color: rgba(99, 102, 241, 0.25);
+}
+.zer-dark .zer-tr {
+  border-bottom-color: rgba(140, 150, 250, 0.85);
+}
+.zer-dark .zer-tr[data-zer-showing="orig"] {
+  border-bottom-color: rgba(140, 150, 250, 0.4);
 }
 
 /* Appended Chinese translation (for blocks with code/links). A separate
@@ -99,6 +109,10 @@
   color: #6b7280;
   font-size: 0.92em;
   line-height: 1.6;
+}
+.zer-dark .zer-append {
+  border-left-color: rgba(140, 150, 250, 0.7);
+  color: #9aa0a8;
 }
 
 /* Output-side status indicator, top-right. */
@@ -157,11 +171,11 @@
 #zer-popup.zer-fail {
   color: #b7791f;
 }
-#zer-popup.zer-dark {
+.zer-dark #zer-popup {
   color: #e6e7ea;
   background: #2b2c31;
   border-color: #44464d;
 }
-#zer-popup.zer-dark.zer-fail {
+.zer-dark #zer-popup.zer-fail {
   color: #e0a94a;
 }
