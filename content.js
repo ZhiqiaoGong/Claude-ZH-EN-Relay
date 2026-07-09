@@ -204,6 +204,15 @@
   }
 
   // ---- status bar + review panel -----------------------------------------
+  // Detect claude's actual theme by the page background brightness, so we match
+  // it whether dark mode comes from claude's in-app toggle or the OS.
+  function pageIsDark() {
+    const m = getComputedStyle(document.body).backgroundColor.match(/\d+/g);
+    if (!m) return false;
+    const [r, g, b] = m.map(Number);
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b < 128;
+  }
+
   // Place a fixed element just above the composer so it never covers the input.
   function positionAboveComposer(node, gap) {
     const composer =
@@ -243,16 +252,13 @@
     reviewEl.textContent = "";
     const orig = document.createElement("div");
     orig.className = "zer-orig";
-    const tag = document.createElement("span");
-    tag.className = "zer-tag";
-    tag.textContent = "原文";
-    orig.appendChild(tag);
-    orig.appendChild(document.createTextNode(original));
+    orig.textContent = original;
     const tip = document.createElement("div");
     tip.className = "zer-tip";
     tip.innerHTML = "<b>回车</b> 发送 · <b>Esc</b> 撤回";
     reviewEl.appendChild(orig);
     reviewEl.appendChild(tip);
+    reviewEl.classList.toggle("zer-dark", pageIsDark());
     reviewEl.style.display = "block";
     positionAboveComposer(reviewEl, 8);
   }
@@ -736,6 +742,7 @@
     const toZh = !CJK_RE.test(text);
     selPopup = document.createElement("div");
     selPopup.id = "zer-popup";
+    selPopup.classList.toggle("zer-dark", pageIsDark());
     selPopup.textContent = "翻译中…";
     placeAt(selPopup, x, y, 360);
     document.body.appendChild(selPopup);

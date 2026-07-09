@@ -35,7 +35,9 @@
 }
 
 /* Review panel: your original Chinese (read-only) shown above the composer so
-   you can compare it with the English in the box before sending. */
+   you can compare it with the English in the box before sending. A light quote
+   bar — same visual language as the reply translations — over a soft but
+   visible backing so it never silently hides content. Adapts to dark mode. */
 #zer-review {
   position: fixed;
   left: 50%;
@@ -43,34 +45,40 @@
   transform: translateX(-50%);
   z-index: 2147483647;
   display: none;
+  width: fit-content;
   max-width: min(90vw, 720px);
-  padding: 9px 14px;
-  border-radius: 12px;
-  color: #1a202c;
-  background: #fff;
-  border: 1px solid #cbd5e0;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.16);
+  padding: 8px 12px 8px 11px;
+  border-left: 2px solid rgba(99, 102, 241, 0.7);
+  background: #ecedf3;
+  color: #3a3d47;
   font-size: 14px;
   line-height: 1.5;
 }
-#zer-review .zer-tag {
-  display: inline-block;
-  margin-right: 8px;
-  padding: 0 6px;
-  border-radius: 4px;
-  background: rgba(99, 102, 241, 0.12);
-  color: #4f46e5;
-  font-size: 11px;
-  vertical-align: 1px;
+#zer-review .zer-orig {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 #zer-review .zer-tip {
-  margin-top: 5px;
-  color: #718096;
+  margin-top: 4px;
+  color: #8a8f99;
   font-size: 12px;
 }
 #zer-review .zer-tip b {
-  color: #1a202c;
+  color: #3a3d47;
   font-weight: 600;
+}
+#zer-review.zer-dark {
+  border-left-color: rgba(129, 140, 248, 0.75);
+  background: #2b2c31;
+  color: #d4d6db;
+}
+#zer-review.zer-dark .zer-tip {
+  color: #9aa0a8;
+}
+#zer-review.zer-dark .zer-tip b {
+  color: #d4d6db;
 }
 
 /* Translated reply blocks: clickable to reveal the original. */
@@ -148,4 +156,12 @@
 }
 #zer-popup.zer-fail {
   color: #b7791f;
+}
+#zer-popup.zer-dark {
+  color: #e6e7ea;
+  background: #2b2c31;
+  border-color: #44464d;
+}
+#zer-popup.zer-dark.zer-fail {
+  color: #e0a94a;
 }
