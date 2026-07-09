@@ -299,7 +299,12 @@
           '.font-claude-response, .font-claude-message, [data-testid="chat-input"], [contenteditable]'
         )
       ) {
-        return; // skip assistant replies and the composer
+        return; // skip assistant replies and the composer itself
+      }
+      // skip any wrapper that contains the composer (its text briefly equals the
+      // just-written English while you are reviewing, before it is sent)
+      if (el.querySelector('[data-testid="chat-input"], [contenteditable], textarea')) {
+        return;
       }
       const t = norm(el.textContent);
       if (!sentOriginals.has(t)) return;
