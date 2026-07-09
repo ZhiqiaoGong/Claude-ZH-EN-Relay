@@ -252,6 +252,7 @@
     }
 
     writeText(editor, english);
+    rememberSent(english, originalText);
 
     if (settings.autoSend) {
       pendingConfirm = false;
@@ -274,6 +275,68 @@
     originalText = "";
     pendingConfirm = false;
     hideBar();
+  }
+
+  // ---- keep your own bubbles readable ------------------------------------
+  // Your sent bubble shows English (that is what was sent). Remember the
+  // Chinese you actually typed and print it under the bubble, so scrolling back
+  // through your own messages stays readable. Matching is by the exact sent
+  // English text, so it needs no knowledge of claude.ai's bubble markup. This
+  // lives only in memory, so it covers the current session, not after reload.
+  const sentOriginals = new Map(); // normalized English -> original Chinese
+  const norm = (s) => (s || "").replace(/\s+/g, " ").trim();
+
+  function rememberSent(english, chinese) {
+    if (chinese) sentOriginals.set(norm(english), chinese);
+  }
+
+  function annotateSentBubbles() {
+    if (!settings.enabled || !sentOriginals.size) return;
+    const hits = new Map(); // english -> matching leaf elements
+    document.querySelectorAll("div, p").forEach((el) => {
+      if (
+        el.closest(
+          '.font-claude-response, .font-claude-message, [data-testid="chat-input"], [contenteditable]'
+        )
+      ) {
+        return; // skip assistant replies and the composer
+      }
+      const t = norm(el.textContent);
+      if (!sentOriginals.has(t)) return;
+      if (!hits.has(t)) hits.set(t, []);
+      hits.get(t).push(el);
+    });
+    hits.forEach((list, en) => {
+      // innermost matches only (the tightest element holding just this text)
+      const inner = list.filter((m) => !list.some((o) => o !== m && m.contains(o)));
+      inner.forEach((el) => {
+        const next = el.nextElementSibling;
+        if (next && next.classList.contains("zer-mine")) return;
+        const div = document.createElement("div");
+        div.className = "zer-mine";
+        div.textContent = sentOriginals.get(en);
+        el.after(div);
+      });
+    });
+  }
+
+  // Throttled so it stays cheap during reply streaming (runs at most ~1/700ms).
+  let annotateAt = 0;
+  let annotateQueued = false;
+  function scheduleAnnotate() {
+    if (!sentOriginals.size) return;
+    const now = Date.now();
+    if (now - annotateAt > 700) {
+      annotateAt = now;
+      annotateSentBubbles();
+    } else if (!annotateQueued) {
+      annotateQueued = true;
+      setTimeout(() => {
+        annotateQueued = false;
+        annotateAt = Date.now();
+        annotateSentBubbles();
+      }, 700);
+    }
   }
 
   // Single capturing keydown handler at document level: robust to the SPA
@@ -557,17 +620,20 @@
   }
 
   const replyObserver = new MutationObserver((muts) => {
-    if (!settings.enabled || !settings.translateReplies) return;
-    for (const m of muts) {
-      if (m.type === "attributes") {
-        // the streaming flag flipped: (re)check replies inside this turn
-        m.target.querySelectorAll &&
-          m.target.querySelectorAll(REPLY_SEL).forEach(scheduleReply);
-        continue;
+    if (!settings.enabled) return;
+    if (settings.translateReplies) {
+      for (const m of muts) {
+        if (m.type === "attributes") {
+          // the streaming flag flipped: (re)check replies inside this turn
+          m.target.querySelectorAll &&
+            m.target.querySelectorAll(REPLY_SEL).forEach(scheduleReply);
+          continue;
+        }
+        const reply = findReply(m.target);
+        if (reply) scheduleReply(reply);
       }
-      const reply = findReply(m.target);
-      if (reply) scheduleReply(reply);
     }
+    scheduleAnnotate();
   });
   replyObserver.observe(document.body, {
     subtree: true,

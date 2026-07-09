@@ -45,7 +45,8 @@
 
 /* Appended Chinese translation (for blocks with code/links). A separate
    block below the original, visually grouped by a thin accent border. */
-.zer-append {
+.zer-append,
+.zer-mine {
   margin: 4px 0 0;
   padding: 2px 0 2px 12px;
   border-left: 2px solid rgba(99, 102, 241, 0.55);
