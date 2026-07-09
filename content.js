@@ -378,29 +378,16 @@
     return el.closest(USER_SEL);
   }
 
-  // Show the Chinese under your own sent bubble. If we captured exactly what you
-  // typed (this session), show that verbatim — no translation, so any code you
-  // typed is preserved as-is. Otherwise translate the bubble like a reply, which
-  // covers older messages and inherits the same layout mode and code handling.
-  function appendMine(bubble, chinese) {
-    if (bubble.querySelector(".zer-mine")) return; // already shown
-    const anchor = bubble.querySelector("p");
-    const div = document.createElement("div");
-    div.className = "zer-mine";
-    div.textContent = chinese;
-    if (anchor) anchor.after(div);
-    else bubble.appendChild(div);
-  }
-
+  // Render your own sent bubble with the same modes as replies. If we captured
+  // exactly what you typed (this session, single block), use that as the Chinese
+  // so it is accurate. Otherwise translate the bubble's English like a reply,
+  // which covers older messages (possibly less accurate).
   function processUserBubble(el) {
-    if (contextInvalid || el.hasAttribute(DONE_ATTR)) return;
-    const en = norm(el.textContent);
-    if (sentOriginals.has(en)) {
-      el.setAttribute(DONE_ATTR, "1");
-      appendMine(el, sentOriginals.get(en));
-      return;
-    }
-    translateReply(el); // no captured original: re-translate like a reply
+    const captured = sentOriginals.get(norm(el.textContent));
+    return translateBlocks(el, (texts) => {
+      if (captured && texts.length === 1) return [captured];
+      return cachedTranslateBatch(texts);
+    });
   }
 
   function scheduleUser(el) {
@@ -522,11 +509,13 @@
     return out;
   }
 
-  async function translateReply(el) {
+  // Render a container's blocks under the current mode. `resolve(texts)` yields
+  // the Chinese for each block — from the API for replies, or from the exact
+  // text you typed for your own messages. This keeps replies and your own
+  // bubbles looking identical; only the source of the Chinese differs.
+  async function translateBlocks(el, resolve) {
     if (contextInvalid || el.hasAttribute(DONE_ATTR)) return;
 
-    // Decide per block, dropping any this mode leaves untouched, so we do not
-    // waste translation calls on skipped paragraphs.
     const items = [];
     for (const node of collectBlocks(el)) {
       const how = decideRender(node);
@@ -539,7 +528,7 @@
     const texts = items.map((it) => it.node.textContent.trim());
     outInFlight++;
     updateOutStatus();
-    const out = await cachedTranslateBatch(texts);
+    const out = await resolve(texts);
     outInFlight--;
     updateOutStatus();
     if (!out) {
@@ -551,6 +540,10 @@
       if (it.how === "overlay") applyOverlay(it.node, texts[i], out[i]);
       else applyAppend(it.node, out[i]);
     });
+  }
+
+  function translateReply(el) {
+    return translateBlocks(el, cachedTranslateBatch);
   }
 
   // ---- output-side status indicator (top-right) --------------------------
@@ -619,10 +612,25 @@
           m.target.querySelectorAll(REPLY_SEL).forEach(scheduleReply);
         continue;
       }
+      // context of the change (covers streaming text inside an existing reply)
       const reply = findReply(m.target);
       if (reply) scheduleReply(reply);
       const bubble = findUserBubble(m.target);
       if (bubble) scheduleUser(bubble);
+      // freshly inserted nodes (a whole reply or your message added at once —
+      // here m.target is the parent, so closest() would miss it)
+      m.addedNodes &&
+        m.addedNodes.forEach((n) => {
+          if (n.nodeType !== 1) return;
+          if (n.matches) {
+            if (n.matches(REPLY_SEL)) scheduleReply(n);
+            if (n.matches(USER_SEL)) scheduleUser(n);
+          }
+          if (n.querySelectorAll) {
+            n.querySelectorAll(REPLY_SEL).forEach(scheduleReply);
+            n.querySelectorAll(USER_SEL).forEach(scheduleUser);
+          }
+        });
     }
   });
   replyObserver.observe(document.body, {
