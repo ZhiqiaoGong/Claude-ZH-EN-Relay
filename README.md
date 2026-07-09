@@ -17,9 +17,11 @@ Yifa lets you keep typing Chinese while Claude receives English, and reads back 
 Ordinary translation extensions only translate what is shown on the page; they never change what you send. Yifa works on the message itself:
 
 - **Sends English, not Chinese.** Your input is translated to English before it leaves the box, so the model receives the compact English. A normal translator cannot do this.
-- **Review before send.** The English appears in the box first — Enter to send, Esc to undo. A bad translation gets caught before the model ever sees it.
+- **Review before send.** The English lands in the box with your original Chinese shown right above it, so you can compare the two before it goes out. Enter to send, Esc to undo — a bad translation gets caught before the model ever sees it.
 - **Replies back in Chinese, three layouts.** Hybrid (default) replaces plain text in place and leaves code untouched; full bilingual; or plain-text only.
+- **Your own messages too.** Your sent bubble shows the English that went out, with the Chinese underneath, so scrolling back through the conversation stays readable.
 - **Select to translate.** Highlight any text for an instant popup.
+- **Light and dark.** Everything adapts to claude.ai's theme.
 - **Never touches your traffic.** It only edits text on the page, the way a writing assistant does. No network interception, no server of its own.
 
 Select any text for an instant translation:

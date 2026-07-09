@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "译发 · Claude ZH-EN Relay",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "在 claude.ai 用中文对话，发送前自动译为英文以节省用量额度；回复译回中文。翻译可见可撤销，不修改任何网络请求。",
   "permissions": ["storage"],
   "icons": {
