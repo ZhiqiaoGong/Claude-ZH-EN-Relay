@@ -34,11 +34,11 @@
     );
   }
 
-  // pendingConfirm: we have already translated and are waiting for the user to
-  // press Enter again (or click send) to actually send the English text.
-  let pendingConfirm = false;
-  let originalText = ""; // stashed Chinese, for undo
-  let activeEditor = null; // last focused editable, for the click path
+  // All send-side state is tied to the actual chat composer. This prevents
+  // confirmation/undo from leaking into other contenteditable areas.
+  let pendingConfirm = null;
+  let activeRequest = null;
+  let activeEditor = null; // last focused composer, for the click path
 
   console.log("[ZER] content script loaded on", location.href);
 
@@ -55,6 +55,7 @@
 
     // Re-render existing replies when the layout, toggle, or engine changes.
     if (
+      "enabled" in changes ||
       "replyMode" in changes ||
       "translateReplies" in changes ||
       "engine" in changes ||
@@ -67,11 +68,16 @@
         document.querySelectorAll(USER_SEL).forEach(scheduleUser);
       }
     }
+    if ("enabled" in changes && !settings.enabled) {
+      cancelSendFlow();
+      removeSelUI();
+    }
   });
 
   // ---- editor helpers ----------------------------------------------------
-  // Match any contenteditable, not just ProseMirror by class name, so we are
-  // robust to claude.ai's exact markup.
+  const COMPOSER_SEL =
+    '[data-chat-input-container="true"], [data-testid="chat-input"]';
+
   function getEditor(node) {
     const el = node && node.nodeType === 3 ? node.parentElement : node;
     if (!el || !el.closest) return null;
@@ -80,10 +86,16 @@
     return ce;
   }
 
+  function getComposerEditor(node) {
+    const editor = getEditor(node);
+    if (!editor || !editor.closest(COMPOSER_SEL)) return null;
+    return editor;
+  }
+
   document.addEventListener(
     "focusin",
     (e) => {
-      const ed = getEditor(e.target);
+      const ed = getComposerEditor(e.target);
       if (ed) activeEditor = ed;
     },
     true
@@ -93,22 +105,31 @@
     return (editor.innerText || "").replace(/ /g, " ").trim();
   }
 
+  function sameText(a, b) {
+    return (a || "").replace(/\s+/g, " ").trim() ===
+      (b || "").replace(/\s+/g, " ").trim();
+  }
+
   // Reliably replace the editor content with `text`. ProseMirror ignores raw
   // DOM mutation, so we go through execCommand('insertText') on a full
   // selection, which fires the input events ProseMirror listens for. A
   // synthetic paste is used as a fallback.
   function writeText(editor, text) {
     editor.focus();
-    const sel = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    const selectAll = () => {
+      const sel = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    };
+    selectAll();
 
     const ok = document.execCommand("insertText", false, text);
-    if (ok) return true;
+    if (ok && sameText(getPlainText(editor), text)) return true;
 
     try {
+      selectAll();
       const dt = new DataTransfer();
       dt.setData("text/plain", text);
       editor.dispatchEvent(
@@ -118,7 +139,7 @@
           cancelable: true,
         })
       );
-      return true;
+      return sameText(getPlainText(editor), text);
     } catch (e) {
       return false;
     }
@@ -156,9 +177,9 @@
   function markContextInvalid() {
     if (contextInvalid) return;
     contextInvalid = true;
+    cancelSendFlow();
     outInFlight = 0;
     updateOutStatus();
-    hideReview();
     showBar("译发已更新或重载 · 请刷新此页面", "zer-warn");
   }
 
@@ -295,6 +316,12 @@
       markContextInvalid();
       return;
     }
+    if (activeRequest) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      showBar("翻译中…", "zer-info");
+      return;
+    }
     const text = getPlainText(editor);
     if (!text) return; // nothing to do, let it through
     if (!CJK_RE.test(text)) return; // already English, let it through
@@ -303,43 +330,101 @@
     e.preventDefault();
     e.stopImmediatePropagation();
 
-    originalText = text;
+    const request = { editor, text };
+    activeRequest = request;
     showBar("翻译中…", "zer-info");
 
     const english = await translate(text);
+    if (activeRequest !== request) return;
+    activeRequest = null;
+
+    // Do not overwrite anything the user typed while translation was pending.
+    if (!editor.isConnected || !sameText(getPlainText(editor), text)) {
+      showBar("输入内容已变更 · 请重新回车翻译", "zer-warn");
+      return;
+    }
     if (!english) {
       showBar("翻译失败 · 回车按原文发送 · Esc 取消", "zer-warn");
       // Leave the Chinese in place; treat next Enter as a plain send.
-      pendingConfirm = true;
+      pendingConfirm = { editor, originalText: text, mode: "original" };
       return;
     }
 
-    writeText(editor, english);
-    rememberSent(english, originalText);
+    if (!writeText(editor, english) || !sameText(getPlainText(editor), english)) {
+      showBar("译文写入失败 · 已停止发送，请重试", "zer-warn");
+      return;
+    }
+    rememberSent(english, text);
 
     if (settings.autoSend) {
-      pendingConfirm = false;
       // Give claude.ai a moment to register the English text in its own state
       // before we send; sending immediately can fire off the stale Chinese.
       showBar("已译为英文 · 发送中…", "zer-info");
-      setTimeout(() => {
-        hideBar();
-        triggerSend(editor);
+      const confirm = {
+        editor,
+        originalText: text,
+        translatedText: english,
+        mode: "auto",
+        timer: null,
+      };
+      pendingConfirm = confirm;
+      confirm.timer = setTimeout(() => {
+        if (pendingConfirm !== confirm) return;
+        clearPendingConfirm();
+        if (
+          settings.enabled &&
+          editor.isConnected &&
+          sameText(getPlainText(editor), english) &&
+          !CJK_RE.test(getPlainText(editor))
+        ) {
+          triggerSend(editor);
+        } else {
+          showBar("发送前校验失败 · 已停止自动发送", "zer-warn");
+        }
       }, 150);
       return;
     }
 
-    pendingConfirm = true;
+    pendingConfirm = {
+      editor,
+      originalText: text,
+      translatedText: english,
+      mode: "review",
+    };
     hideBar();
-    showReview(originalText);
+    showReview(text);
   }
 
   function restoreOriginal(editor) {
-    if (originalText) writeText(editor, originalText);
-    originalText = "";
-    pendingConfirm = false;
+    const state = pendingConfirm;
+    clearPendingConfirm();
+    if (state && state.editor === editor && state.originalText) {
+      writeText(editor, state.originalText);
+    }
+  }
+
+  function clearPendingConfirm() {
+    if (pendingConfirm && pendingConfirm.timer) {
+      clearTimeout(pendingConfirm.timer);
+    }
+    pendingConfirm = null;
     hideBar();
     hideReview();
+  }
+
+  function cancelSendFlow() {
+    activeRequest = null;
+    const state = pendingConfirm;
+    clearPendingConfirm();
+    if (
+      state &&
+      state.mode !== "original" &&
+      state.editor.isConnected &&
+      sameText(getPlainText(state.editor), state.translatedText)
+    ) {
+      writeText(state.editor, state.originalText);
+    }
+    activeEditor = null;
   }
 
   // ---- keep your own bubbles readable ------------------------------------
@@ -361,11 +446,15 @@
     (e) => {
       if (!settings.enabled) return;
 
-      const editor = getEditor(e.target);
+      const editor = getComposerEditor(e.target);
       if (!editor) return;
       activeEditor = editor;
 
-      if (e.key === "Escape" && pendingConfirm) {
+      if (
+        e.key === "Escape" &&
+        pendingConfirm &&
+        pendingConfirm.editor === editor
+      ) {
         e.preventDefault();
         e.stopImmediatePropagation();
         restoreOriginal(editor);
@@ -378,11 +467,15 @@
         return;
       }
 
-      if (pendingConfirm) {
-        // Second Enter: user confirmed. Let claude.ai send the English text.
-        pendingConfirm = false;
-        hideBar();
-        hideReview();
+      if (pendingConfirm && pendingConfirm.editor === editor) {
+        const state = pendingConfirm;
+        const current = getPlainText(editor);
+        clearPendingConfirm();
+        // A failed translation explicitly offers sending the original. For a
+        // translated draft, never let newly-added Chinese bypass translation.
+        if (state.mode !== "original" && CJK_RE.test(current)) {
+          handleSendIntent(editor, e);
+        }
         return;
       }
 
@@ -401,16 +494,27 @@
       const label = (btn.getAttribute("aria-label") || "").toLowerCase();
       if (!label.includes("send")) return;
 
-      if (pendingConfirm) {
+      const composer = btn.closest(COMPOSER_SEL);
+      if (!composer) return;
+      const editor =
+        getComposerEditor(composer.querySelector("[contenteditable]")) ||
+        (activeEditor && composer.contains(activeEditor) ? activeEditor : null);
+      if (!editor) return;
+      activeEditor = editor;
+
+      if (pendingConfirm && pendingConfirm.editor === editor) {
+        const state = pendingConfirm;
+        const current = getPlainText(editor);
         // clicking send confirms the reviewed English; let it through
-        pendingConfirm = false;
-        hideBar();
-        hideReview();
+        clearPendingConfirm();
+        if (state.mode !== "original" && CJK_RE.test(current)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          handleSendIntent(editor, e);
+        }
         return;
       }
 
-      const editor = activeEditor || getEditor(document.activeElement);
-      if (!editor) return;
       const text = getPlainText(editor);
       if (!text || !CJK_RE.test(text)) return;
 
@@ -573,13 +677,18 @@
     });
     if (missTexts.length) {
       const got = await translateBatch(missTexts);
-      if (!got) return null; // network failure: signal a retry
+      if (!Array.isArray(got) || got.length !== missTexts.length) return null;
+      let failed = false;
       got.forEach((v, j) => {
         out[missIdx[j]] = v;
-        if (v != null) cacheSet(missTexts[j], v);
+        if (typeof v === "string" && v) cacheSet(missTexts[j], v);
+        else failed = true;
       });
+      // Keep successful items cached, but do not mark the container complete.
+      // A manual retry will only request the missing items.
+      if (failed) return null;
     }
-    return out;
+    return out.every((v) => typeof v === "string" && v) ? out : null;
   }
 
   // Render a container's blocks under the current mode. `resolve(texts)` yields
@@ -604,7 +713,11 @@
     const out = await resolve(texts);
     outInFlight--;
     updateOutStatus();
-    if (!out) {
+    if (!settings.enabled || !settings.translateReplies || contextInvalid) {
+      el.removeAttribute(DONE_ATTR);
+      return;
+    }
+    if (!Array.isArray(out) || out.length !== items.length) {
       el.removeAttribute(DONE_ATTR); // allow a later retry
       flashOutError();
       return;
