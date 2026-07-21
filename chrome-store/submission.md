@@ -5,7 +5,7 @@ Use this for publishing the `v0.3.1` release.
 ## Package
 
 - Upload zip: `/Users/zhiqiaogong/Projects/PythonProject/testcc/yifa-zh-en-relay-v0.3.1.zip`
-- SHA-256: `a2b846bc4d5e462d0421f4d2f6cb1acb3d100777df6a1d56f41b917f91986a3b`
+- SHA-256: `c01c18bca58c06da16a2c5f22aa3b5e7715e39ba45c3f622694711ec830c81e7`
 - Verification: upload only after the package contents match the `v0.3.1` tag.
 
 ## Store Listing
