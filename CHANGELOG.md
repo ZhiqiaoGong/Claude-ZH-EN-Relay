@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.3.1 — 2026-07-20
+
+- Rebranded the extension as Yifa (译发) · ZH-EN Relay, with claude.ai
+  referenced only as the supported service and clear independent/unofficial
+  positioning.
+- Limited send interception to the actual chat composer so other editable areas
+  on claude.ai are never hijacked.
+- Prevented stale or duplicate translation requests from overwriting newer
+  drafts, and added write-back verification before automatic sending.
+- Made partial reply-translation failures visible and retryable, and completed
+  enable/disable state handling.
+- Migrated Gemini translation from the retired Gemini 2.0 Flash model to Gemini
+  3.5 Flash and moved API-key authentication from the URL to a request header.
+- Expanded the privacy policy with data retention and Chrome Web Store Limited
+  Use disclosures.
+
 ## v0.3.0 — 2026-07-09
 
 - Pre-send bilingual review: while checking the English in the box, your original Chinese shows right above it (Enter to send, Esc to undo).

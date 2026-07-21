@@ -25,11 +25,14 @@ if git rev-parse "$tag" >/dev/null 2>&1; then
   exit 1
 fi
 
-git tag -a "$tag" -m "$tag"
-git push origin "$tag"
-
+# Build and validate before creating a remote tag, so a packaging failure leaves
+# the release safe to retry.
 ./package.sh
 zip="yifa-zh-en-relay-${tag}.zip"
+unzip -t "$zip" >/dev/null
+
+git tag -a "$tag" -m "$tag"
+git push origin "$tag"
 
 echo
 echo "tagged and pushed $tag, built $zip"

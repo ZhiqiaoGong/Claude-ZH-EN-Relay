@@ -138,17 +138,19 @@ async function geminiTranslateBatch(texts, from, to, key) {
 
   const url =
     "https://generativelanguage.googleapis.com/v1beta/models/" +
-    "gemini-2.0-flash:generateContent?key=" +
-    encodeURIComponent(key.trim());
+    "gemini-3.5-flash:generateContent";
 
   const res = await fetchWithRetry(
     url,
     {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": key.trim(),
+      },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0 },
+        generationConfig: { responseMimeType: "application/json" },
       }),
     },
     20000

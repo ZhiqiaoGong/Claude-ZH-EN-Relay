@@ -1,24 +1,25 @@
 # Chrome Web Store Submission Notes
 
-Use this for publishing the already-built `v0.2.0` release.
+Use this for publishing the `v0.3.1` release.
 
 ## Package
 
-- Upload zip: `/Users/zhiqiaogong/Projects/PythonProject/testcc/yifa-zh-en-relay-v0.2.0.zip`
-- SHA-256: `8782c35a5f77d15da55651c7a550dbbd165724c0cad40ddf1d37edb7b41b8a90`
-- Verified: every runtime file inside this zip matches git tag `v0.2.0`.
-- Important: do not re-run `package.sh` from current `main` for this submission. Current `main` has post-`v0.2.0` changes in `content.js` and `overlay.css`.
+- Upload zip: `/Users/zhiqiaogong/Projects/PythonProject/testcc/yifa-zh-en-relay-v0.3.1.zip`
+- SHA-256: `a2b846bc4d5e462d0421f4d2f6cb1acb3d100777df6a1d56f41b917f91986a3b`
+- Verification: upload only after the package contents match the `v0.3.1` tag.
 
 ## Store Listing
 
 - Category: Productivity
 - Language: Chinese (Simplified)
+- Store title: `译发 · ZH-EN Relay`
+- Short description: `在 claude.ai 用中文输入、英文发送，并将回复译回中文的非官方第三方扩展。`
 - Homepage URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay`
 - Support URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/issues`
-- Privacy policy URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/blob/v0.2.0/PRIVACY.md`
+- Privacy policy URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/blob/v0.3.1/PRIVACY.md`
 - Store icon: `/Users/zhiqiaogong/Projects/PythonProject/testcc/icons/icon128.png`
-- Small promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/chrome-store/assets/small-promo-tile-440x280.png`
-- Top promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/chrome-store/assets/top-promo-tile-1400x560.png`
+- Small promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/assets/small-promo-tile-440x280.png`
+- Top promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/assets/top-promo-tile-1400x560.png`
 
 ### Screenshots
 
@@ -32,7 +33,7 @@ Recommended upload order:
 ### Detailed Description
 
 ```text
-译发是一个非官方的 claude.ai 辅助扩展，让中文用户可以继续用中文思考和输入，同时把发送给 Claude 的内容转换为更省 token 的英文。
+译发是一款由独立开发者制作、适用于 claude.ai 的非官方第三方扩展，与 Anthropic 无关联，也未获得其赞助、认可或授权。它让中文用户可以继续用中文思考和输入，同时把发送给 Claude 的内容转换为更省 token 的英文。
 
 它只在 claude.ai 生效。你输入中文后，扩展会先把内容翻译成英文并写回输入框，默认暂停等待你核对：回车发送，Esc 撤回。Claude 回复完成后，扩展可以把英文回复自动译回中文，并提供混合、完整对照、纯文字三种排版模式。
 
@@ -53,7 +54,7 @@ Recommended upload order:
 
 为了完成翻译，扩展会把你输入的文本、Claude 回复文本或你选中的文本发送给所选翻译服务。默认是 Google Translate；如果你选择 DeepL 或 Gemini 并填写 API key，则发送给对应服务。扩展不会把数据发送给作者运营的服务器，也不会做分析、跟踪或广告。请不要通过本扩展处理敏感内容。
 
-This is an unofficial personal tool and is not affiliated with Anthropic, Claude, Google, DeepL, or Gemini.
+Claude is a trademark of Anthropic PBC. Google, DeepL, and Gemini are trademarks of their respective owners. Use of these names identifies compatibility or translation providers and does not imply affiliation or endorsement.
 ```
 
 ## Privacy Tab
@@ -117,7 +118,7 @@ Conservative recommended data types to disclose:
 Recommended certification wording, if requested:
 
 ```text
-User text is used only to perform the requested translation. The extension does not sell, transfer, analyze, or use user data for advertising, tracking, creditworthiness, or unrelated purposes. No user data is sent to servers operated by the developer.
+User text is used only to provide the extension's visible translation features. It is transferred only to the selected translation provider as necessary to perform translation. The extension does not sell, analyze, or use user data for advertising, tracking, creditworthiness, or unrelated purposes; does not permit humans to read user data; and does not send user data to servers operated by the developer. The extension's use of information complies with the Chrome Web Store User Data Policy, including the Limited Use requirements.
 ```
 
 ## Distribution
@@ -144,8 +145,8 @@ The extension does not intercept claude.ai network requests. It only edits visib
 
 ## Pre-Submit Checks
 
-- Confirm the uploaded package name is exactly `yifa-zh-en-relay-v0.2.0.zip`.
-- Confirm the dashboard package version shows `0.2.0`.
+- Confirm the uploaded package name is exactly `yifa-zh-en-relay-v0.3.1.zip`.
+- Confirm the dashboard package version shows `0.3.1`.
 - Confirm remote code is declared as not used.
 - Confirm the privacy disclosure mentions third-party translation providers.
 - Confirm the privacy policy URL is publicly accessible.

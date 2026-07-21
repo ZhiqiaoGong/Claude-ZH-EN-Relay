@@ -1,8 +1,8 @@
-# 译发 · Claude ZH-EN Relay
+# 译发 · ZH-EN Relay
 
 [English](README.md) | 中文
 
-在 claude.ai 上用中文对话，发送英文，节省用量额度。
+适用于 claude.ai 的独立、非官方第三方扩展：用中文输入、以英文发送，并将回复译回中文。
 
 ![打中文、发英文、回复再译回中文](assets/demo-main.gif)
 

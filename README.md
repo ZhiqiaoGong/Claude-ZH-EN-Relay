@@ -1,8 +1,9 @@
-# Yifa (译发) · Claude ZH-EN Relay
+# Yifa (译发) · ZH-EN Relay
 
 English | [中文](README.zh-CN.md)
 
-Chat with claude.ai in Chinese, send in English, save your usage quota.
+An independent, unofficial extension for chatting on claude.ai in Chinese,
+sending in English, and reading replies back in Chinese.
 
 ![Type Chinese, send English, read the reply back in Chinese](assets/demo-main.gif)
 

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "译发 · Claude ZH-EN Relay",
-  "version": "0.3.0",
-  "description": "在 claude.ai 用中文对话，发送前自动译为英文以节省用量额度；回复译回中文。翻译可见可撤销，不修改任何网络请求。",
+  "name": "译发 · ZH-EN Relay",
+  "version": "0.3.1",
+  "description": "在 claude.ai 用中文输入、英文发送，并将回复译回中文的非官方第三方扩展。翻译可见可撤销。",
   "permissions": ["storage"],
   "icons": {
     "16": "icons/icon16.png",
@@ -30,7 +30,7 @@
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "译发 · Claude ZH-EN Relay",
+    "default_title": "译发 · ZH-EN Relay",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
