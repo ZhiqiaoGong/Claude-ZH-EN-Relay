@@ -16,7 +16,7 @@ Use this for publishing the `v0.3.2` release.
 - Short description: `在 claude.ai 用中文输入、英文发送，并将回复译回中文的非官方第三方扩展。`
 - Homepage URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay`
 - Support URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/issues`
-- Privacy policy URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/blob/v0.3.2/PRIVACY.md`
+- Privacy policy URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/blob/main/PRIVACY.md`
 - Store icon: `/Users/zhiqiaogong/Projects/PythonProject/testcc/icons/icon128.png`
 - Small promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/assets/small-promo-tile-440x280.png`
 - Top promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/assets/top-promo-tile-1400x560.png`
