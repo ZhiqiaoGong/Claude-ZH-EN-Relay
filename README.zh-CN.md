@@ -65,13 +65,13 @@
 
 Google 是默认引擎，无需任何设置。另有两个可选引擎，填入免费 API key 后质量更好——在面板的**「高级」**里选择。所有 key 只存在你的浏览器本地，且仅发送给对应的服务商。
 
-<img src="assets/popup.png" alt="扩展面板中展开的「高级」引擎选择" width="320">
+<img src="assets/popup-v0.3.2.jpg" alt="扩展面板中已启用 Gemini Flash-Lite" width="320">
 
 | 引擎 | 设置 | 适合 |
 | --- | --- | --- |
 | **Google** | 无（默认） | 日常使用。免费、开箱即用；非官方，偶尔可能限流。 |
 | **DeepL** | 免费 API key | 质量更好的机器翻译，尤其技术内容。 |
-| **Gemini** | 免费 API key | 大模型翻译，能读上下文与语气。 |
+| **Gemini** | 免费 API key | 低延迟 Flash-Lite 翻译，兼顾上下文与语气。 |
 
 未填 key 时，DeepL 和 Gemini 都会自动回退到 Google，不会出错。
 

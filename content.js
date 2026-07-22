@@ -186,7 +186,7 @@
   // Send a message to the background and always settle: on reply, on error,
   // after a timeout, or if the extension context is gone — so a dead worker or
   // an orphaned content script never leaves callers hanging (or throws).
-  function sendWithTimeout(msg, ms, onResp) {
+  function sendWithTimeout(msg, ms, onResp, onError) {
     return new Promise((resolve) => {
       let done = false;
       const finish = (v) => {
@@ -198,30 +198,77 @@
       // chrome.runtime.id is undefined once the context is invalidated.
       if (!chrome.runtime || !chrome.runtime.id) {
         markContextInvalid();
+        if (onError) onError({ code: "extension_context" });
         finish(null);
         return;
       }
-      const timer = setTimeout(() => finish(null), ms);
+      const timer = setTimeout(() => {
+        if (onError) onError({ code: "timeout" });
+        finish(null);
+      }, ms);
       try {
         chrome.runtime.sendMessage(msg, (resp) => {
+          // Reading lastError inside the callback also prevents Chrome from
+          // reporting an "unchecked runtime.lastError" for a late response.
+          const runtimeError = chrome.runtime.lastError;
+          // A late service-worker response must not overwrite the timeout error
+          // or mutate UI state after this promise has already settled.
+          if (done) return;
           clearTimeout(timer);
-          if (chrome.runtime.lastError || !resp || !resp.ok) finish(null);
-          else finish(onResp(resp));
+          if (runtimeError || !resp || !resp.ok) {
+            if (onError) {
+              onError(
+                (resp && resp.error) || {
+                  code: runtimeError ? "extension_context" : "request_failed",
+                }
+              );
+            }
+            finish(null);
+          } else finish(onResp(resp));
         });
       } catch (e) {
         clearTimeout(timer);
         markContextInvalid();
+        if (onError) onError({ code: "extension_context" });
         finish(null);
       }
     });
   }
 
   function translate(text) {
+    lastInputError = null;
     return sendWithTimeout(
       { type: "translate", text, from: settings.from, to: settings.to },
-      30000,
-      (resp) => resp.text
+      28000,
+      (resp) => resp.text,
+      (error) => {
+        lastInputError = error;
+      }
     );
+  }
+
+  let lastInputError = null;
+
+  function errorText(error, subject) {
+    const prefix = subject || "翻译";
+    switch (error && error.code) {
+      case "timeout":
+        return prefix + "超时";
+      case "rate_limit":
+        return prefix + "请求过于频繁（429）";
+      case "unavailable":
+        return prefix + "服务繁忙" + (error.status ? "（" + error.status + "）" : "");
+      case "auth":
+        return prefix + " Key 无效或无权限";
+      case "network":
+        return prefix + "网络连接失败";
+      case "invalid_response":
+        return prefix + "返回格式异常";
+      case "extension_context":
+        return "译发已更新或重载 · 请刷新此页面";
+      default:
+        return prefix + "失败";
+    }
   }
 
   // ---- status bar + review panel -----------------------------------------
@@ -344,7 +391,10 @@
       return;
     }
     if (!english) {
-      showBar("翻译失败 · 回车按原文发送 · Esc 取消", "zer-warn");
+      showBar(
+        errorText(lastInputError, "发送翻译") + " · 回车按原文发送 · Esc 取消",
+        "zer-warn"
+      );
       // Leave the Chinese in place; treat next Enter as a plain send.
       pendingConfirm = { editor, originalText: text, mode: "original" };
       return;
@@ -648,11 +698,15 @@
   }
 
   function translateBatch(texts) {
+    let error = null;
     return sendWithTimeout(
       { type: "translateBatch", texts, from: settings.to, to: settings.from },
-      30000,
-      (resp) => resp.texts
-    );
+      28000,
+      (resp) => resp.texts,
+      (reason) => {
+        error = reason;
+      }
+    ).then((translated) => ({ texts: translated, error }));
   }
 
   // Cache of reply translations (English -> Chinese) so re-rendering after a
@@ -676,8 +730,11 @@
       }
     });
     if (missTexts.length) {
-      const got = await translateBatch(missTexts);
-      if (!Array.isArray(got) || got.length !== missTexts.length) return null;
+      const result = await translateBatch(missTexts);
+      const got = result.texts;
+      if (!Array.isArray(got) || got.length !== missTexts.length) {
+        return { texts: null, error: result.error };
+      }
       let failed = false;
       got.forEach((v, j) => {
         out[missIdx[j]] = v;
@@ -686,9 +743,12 @@
       });
       // Keep successful items cached, but do not mark the container complete.
       // A manual retry will only request the missing items.
-      if (failed) return null;
+      if (failed) return { texts: null, error: { code: "partial_failure" } };
     }
-    return out.every((v) => typeof v === "string" && v) ? out : null;
+    return {
+      texts: out.every((v) => typeof v === "string" && v) ? out : null,
+      error: null,
+    };
   }
 
   // Render a container's blocks under the current mode. `resolve(texts)` yields
@@ -710,7 +770,12 @@
     const texts = items.map((it) => it.node.textContent.trim());
     outInFlight++;
     updateOutStatus();
-    const out = await resolve(texts);
+    const resolved = await resolve(texts);
+    // Exact user-message originals already resolve to a plain array; network
+    // translations carry their own error so concurrent replies cannot clobber
+    // one another's diagnostic state.
+    const out = Array.isArray(resolved) ? resolved : resolved && resolved.texts;
+    const error = Array.isArray(resolved) ? null : resolved && resolved.error;
     outInFlight--;
     updateOutStatus();
     if (!settings.enabled || !settings.translateReplies || contextInvalid) {
@@ -719,7 +784,7 @@
     }
     if (!Array.isArray(out) || out.length !== items.length) {
       el.removeAttribute(DONE_ATTR); // allow a later retry
-      flashOutError();
+      flashOutError(error);
       return;
     }
     items.forEach((it, i) => {
@@ -754,12 +819,13 @@
       n.style.display = "none";
     }
   }
-  function flashOutError() {
+  function flashOutError(error) {
     const n = outNode();
     n.className = "zer-warn";
-    n.textContent = usingKeyedEngine()
-      ? "回复翻译失败 · 点此重试；如持续失败请检查引擎设置"
-      : "回复翻译失败 · 点此重试";
+    n.textContent = errorText(error, "回复翻译") + " · 点此重试";
+    if (usingKeyedEngine() && error && error.code === "auth") {
+      n.textContent += "；请检查引擎设置";
+    }
     n.style.display = "block";
     n.onclick = () => {
       n.style.display = "none";
@@ -889,11 +955,14 @@
         to: toZh ? "zh-CN" : "en",
       },
       15000,
-      (resp) => resp.text
+      (resp) => resp.text,
+      (error) => {
+        if (selPopup) selPopup.dataset.zerError = errorText(error, "翻译");
+      }
     ).then((translated) => {
       if (!selPopup) return;
       if (translated == null) {
-        selPopup.textContent = "翻译失败";
+        selPopup.textContent = selPopup.dataset.zerError || "翻译失败";
         selPopup.className = "zer-fail";
       } else {
         selPopup.textContent = translated;

@@ -66,13 +66,13 @@ Create a claude.ai Project with the custom instruction `Always reply in English`
 
 Google is the default and needs no setup. Two optional engines give higher quality if you add a free API key — pick them in the popup under **Advanced**. Every key is stored locally in your browser and sent only to that provider.
 
-<img src="assets/popup.png" alt="Extension popup showing the Advanced engine selector" width="320">
+<img src="assets/popup-v0.3.2.jpg" alt="Extension popup with Gemini Flash-Lite active" width="320">
 
 | Engine | Setup | Best for |
 | --- | --- | --- |
 | **Google** | None (default) | Everyday use. Free, works out of the box; unofficial, may occasionally rate-limit. |
 | **DeepL** | Free API key | Higher-quality machine translation, especially technical text. |
-| **Gemini** | Free API key | LLM translation that reads context and tone. |
+| **Gemini** | Free API key | Low-latency Flash-Lite translation with context and tone awareness. |
 
 Without a key, DeepL and Gemini both fall back to Google, so nothing breaks.
 

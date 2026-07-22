@@ -44,6 +44,27 @@ function renderEngine() {
 // translation, so a wrong or unusable key is caught here rather than silently
 // failing on every reply. Assumes chrome.storage already holds current values.
 let verifyToken = 0;
+const VERIFY_TIMEOUT_MS = 28000;
+
+function verifyErrorText(error) {
+  switch (error && error.code) {
+    case "timeout":
+      return "验证超时 · 请稍后重试";
+    case "rate_limit":
+      return "请求过于频繁（429）· 请稍后重试";
+    case "unavailable":
+      return "服务繁忙" + (error.status ? "（" + error.status + "）" : "") + " · 请稍后重试";
+    case "auth":
+      return "key 无效或没有权限";
+    case "network":
+      return "网络连接失败";
+    case "invalid_response":
+      return "服务返回格式异常";
+    default:
+      return "验证失败 · 请稍后重试";
+  }
+}
+
 function renderEngineNow() {
   const e = engineEl.value;
   const name = { google: "Google", deepl: "DeepL", gemini: "Gemini" }[e];
@@ -61,14 +82,24 @@ function renderEngineNow() {
 
   engineNowEl.textContent = "验证 " + name + " 中…";
   const mine = verifyToken; // ignore stale responses if settings changed again
+  let settled = false;
+  const timer = setTimeout(() => {
+    if (mine !== verifyToken || settled) return;
+    settled = true;
+    engineNowEl.textContent = name + " 验证超时 · 请稍后重试";
+  }, VERIFY_TIMEOUT_MS);
   chrome.runtime.sendMessage(
     { type: "translate", text: "hello", from: "en", to: "zh-CN" },
     (resp) => {
-      if (mine !== verifyToken) return;
-      if (!chrome.runtime.lastError && resp && resp.ok && resp.text) {
+      const runtimeError = chrome.runtime.lastError;
+      if (mine !== verifyToken || settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (!runtimeError && resp && resp.ok && resp.text) {
         engineNowEl.textContent = "当前生效：" + name + " ✓";
       } else {
-        engineNowEl.textContent = name + " key 无效或不可用 · 翻译会失败";
+        const error = resp && resp.error;
+        engineNowEl.textContent = name + " " + verifyErrorText(error);
       }
     }
   );

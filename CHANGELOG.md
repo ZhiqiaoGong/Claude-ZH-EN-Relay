@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.3.2 — 2026-07-21
+
+- Switched Gemini translation to the low-latency Gemini 3.1 Flash-Lite model
+  with minimal thinking.
+- Aligned page and background timeouts so slow retries no longer produce a
+  premature generic failure while the background is still working.
+- Added actionable timeout, rate-limit, service, network, and API-key errors to
+  reply translation and live engine verification.
+
 ## v0.3.1 — 2026-07-20
 
 - Rebranded the extension as Yifa (译发) · ZH-EN Relay, with claude.ai

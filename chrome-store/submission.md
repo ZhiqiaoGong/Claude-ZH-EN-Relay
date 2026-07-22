@@ -1,12 +1,12 @@
 # Chrome Web Store Submission Notes
 
-Use this for publishing the `v0.3.1` release.
+Use this for publishing the `v0.3.2` release.
 
 ## Package
 
-- Upload zip: `/Users/zhiqiaogong/Projects/PythonProject/testcc/yifa-zh-en-relay-v0.3.1.zip`
-- SHA-256: `c01c18bca58c06da16a2c5f22aa3b5e7715e39ba45c3f622694711ec830c81e7`
-- Verification: upload only after the package contents match the `v0.3.1` tag.
+- Upload zip: `/Users/zhiqiaogong/Projects/PythonProject/testcc/yifa-zh-en-relay-v0.3.2.zip`
+- SHA-256: `f357768b5901f126ac46c766405a5ed5945a605a3dd9aef350dbd61be74e98cb`
+- Verification: upload only after the package contents match the `v0.3.2` tag.
 
 ## Store Listing
 
@@ -16,7 +16,7 @@ Use this for publishing the `v0.3.1` release.
 - Short description: `在 claude.ai 用中文输入、英文发送，并将回复译回中文的非官方第三方扩展。`
 - Homepage URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay`
 - Support URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/issues`
-- Privacy policy URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/blob/v0.3.1/PRIVACY.md`
+- Privacy policy URL: `https://github.com/ZhiqiaoGong/Claude-ZH-EN-Relay/blob/v0.3.2/PRIVACY.md`
 - Store icon: `/Users/zhiqiaogong/Projects/PythonProject/testcc/icons/icon128.png`
 - Small promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/assets/small-promo-tile-440x280.png`
 - Top promo tile: `/Users/zhiqiaogong/Projects/PythonProject/testcc/assets/top-promo-tile-1400x560.png`
@@ -145,8 +145,8 @@ The extension does not intercept claude.ai network requests. It only edits visib
 
 ## Pre-Submit Checks
 
-- Confirm the uploaded package name is exactly `yifa-zh-en-relay-v0.3.1.zip`.
-- Confirm the dashboard package version shows `0.3.1`.
+- Confirm the uploaded package name is exactly `yifa-zh-en-relay-v0.3.2.zip`.
+- Confirm the dashboard package version shows `0.3.2`.
 - Confirm remote code is declared as not used.
 - Confirm the privacy disclosure mentions third-party translation providers.
 - Confirm the privacy policy URL is publicly accessible.

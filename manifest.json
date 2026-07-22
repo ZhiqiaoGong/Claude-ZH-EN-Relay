@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "译发 · ZH-EN Relay",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "在 claude.ai 用中文输入、英文发送，并将回复译回中文的非官方第三方扩展。翻译可见可撤销。",
   "permissions": ["storage"],
   "icons": {

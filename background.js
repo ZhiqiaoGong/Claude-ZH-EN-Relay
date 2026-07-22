@@ -3,6 +3,8 @@
 // keeps API keys out of the page context.
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
+const GEMINI_REQUEST_TIMEOUT_MS = 12000;
 
 // fetch with a timeout and one retry on rate-limit / server errors (429, 5xx).
 async function fetchWithRetry(url, opts, timeoutMs) {
@@ -138,7 +140,7 @@ async function geminiTranslateBatch(texts, from, to, key) {
 
   const url =
     "https://generativelanguage.googleapis.com/v1beta/models/" +
-    "gemini-3.5-flash:generateContent";
+    GEMINI_MODEL + ":generateContent";
 
   const res = await fetchWithRetry(
     url,
@@ -150,10 +152,16 @@ async function geminiTranslateBatch(texts, from, to, key) {
       },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: "application/json" },
+        generationConfig: {
+          responseMimeType: "application/json",
+          // Translation does not benefit from a long reasoning pass. Keeping
+          // thinking minimal makes the small live check and reply batches much
+          // more responsive and predictable.
+          thinkingConfig: { thinkingLevel: "minimal" },
+        },
       }),
     },
-    20000
+    GEMINI_REQUEST_TIMEOUT_MS
   );
   if (!res.ok) throw new Error("gemini HTTP " + res.status);
   const data = await res.json();
@@ -184,17 +192,33 @@ async function translateBatch(texts, from, to) {
   return googleTranslateBatch(texts, from, to);
 }
 
+// Keep service/API details useful without exposing request contents or keys.
+// These objects are safe to pass across chrome.runtime messaging and let the
+// UI distinguish a bad key from throttling, overload, and a genuine timeout.
+function errorInfo(err) {
+  const raw = err && err.name === "AbortError" ? "request timeout" : String(err);
+  const status = Number((raw.match(/HTTP\s+(\d{3})/i) || [])[1]) || null;
+  let code = "request_failed";
+  if (/timeout|abort/i.test(raw)) code = "timeout";
+  else if (status === 401 || status === 403) code = "auth";
+  else if (status === 429) code = "rate_limit";
+  else if (status >= 500) code = "unavailable";
+  else if (/parse|unexpected/i.test(raw)) code = "invalid_response";
+  else if (/network|failed to fetch/i.test(raw)) code = "network";
+  return { code, status };
+}
+
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.type === "translate") {
     translateBatch([msg.text], msg.from, msg.to)
       .then((texts) => sendResponse({ ok: true, text: texts[0] }))
-      .catch((err) => sendResponse({ ok: false, error: String(err) }));
+      .catch((err) => sendResponse({ ok: false, error: errorInfo(err) }));
     return true; // keep the message channel open for the async response
   }
   if (msg && msg.type === "translateBatch") {
     translateBatch(msg.texts, msg.from, msg.to)
       .then((texts) => sendResponse({ ok: true, texts }))
-      .catch((err) => sendResponse({ ok: false, error: String(err) }));
+      .catch((err) => sendResponse({ ok: false, error: errorInfo(err) }));
     return true;
   }
   return false;
