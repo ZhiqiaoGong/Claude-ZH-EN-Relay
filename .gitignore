@@ -1,3 +1,8 @@
 .DS_Store
 *.zip
 node_modules/
+.env.local
+__pycache__/
+test-results/
+playwright-report/
+blob-report/

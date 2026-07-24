@@ -76,6 +76,24 @@ Google is the default and needs no setup. Two optional engines give higher quali
 
 Without a key, DeepL and Gemini both fall back to Google, so nothing breaks.
 
+## Reliability tests
+
+The repository includes **33 Playwright browser regression scenarios** covering
+send interception, review/undo, stale-translation races, guarded auto-send,
+streaming replies, all three layouts, code/link preservation, partial-failure
+retry, cache re-rendering, and Google/DeepL/Gemini routing.
+
+The suite runs against a deterministic claude.ai DOM fixture with mocked
+translation responses. It does not send test text to any translation provider.
+
+```bash
+npm ci
+npx playwright install chromium
+npm test
+```
+
+The same suite runs on every push and pull request through GitHub Actions.
+
 ## License
 
 [MIT](LICENSE)

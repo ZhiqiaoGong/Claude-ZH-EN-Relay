@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Yifa claude.ai fixture</title>
+  </head>
+  <body>
+    <main id="conversation"></main>
+
+    <section data-chat-input-container="true">
+      <form id="chat-form">
+        <div
+          id="chat-editor"
+          role="textbox"
+          contenteditable="true"
+          aria-label="Chat input"
+        ></div>
+        <button id="send-button" type="button" aria-label="Send message">
+          Send
+        </button>
+      </form>
+    </section>
+
+    <section>
+      <div
+        id="other-editor"
+        contenteditable="true"
+        aria-label="Unrelated editor"
+      ></div>
+    </section>
+
+    <script>
+      window.__fixture = {
+        sent: [],
+        secondaryEnters: 0,
+      };
+
+      const editor = document.querySelector("#chat-editor");
+      const sendButton = document.querySelector("#send-button");
+
+      function commit(kind) {
+        const text = editor.innerText.trim();
+        if (!text) return;
+        window.__fixture.sent.push({ kind, text });
+        editor.textContent = "";
+        editor.dispatchEvent(new InputEvent("input", { bubbles: true }));
+      }
+
+      editor.addEventListener("keydown", (event) => {
+        if (
+          event.key === "Enter" &&
+          !event.shiftKey &&
+          !event.isComposing &&
+          event.keyCode !== 229 &&
+          !event.defaultPrevented
+        ) {
+          commit("keyboard");
+        }
+      });
+
+      sendButton.addEventListener("click", (event) => {
+        if (!event.defaultPrevented) commit("click");
+      });
+
+      document
+        .querySelector("#other-editor")
+        .addEventListener("keydown", (event) => {
+          if (event.key === "Enter" && !event.defaultPrevented) {
+            window.__fixture.secondaryEnters++;
+          }
+        });
+    </script>
+  </body>
+</html>
