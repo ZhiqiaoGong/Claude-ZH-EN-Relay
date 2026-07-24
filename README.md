@@ -9,15 +9,23 @@ sending in English, and reading replies back in Chinese.
 
 ## Why Yifa
 
-On Claude, the same sentence in Chinese costs roughly 1.5–2x the tokens of its English equivalent. On a Pro or Max plan your usage limit is spent in tokens, so Chinese conversations burn through it faster and hit the cap sooner.
+Yifa is a message-level bilingual relay, not a generic page translator. It
+lets you write in Chinese, review the English text Claude will actually
+receive, and read English replies back in Chinese while keeping the original
+available.
 
-Yifa lets you keep typing Chinese while Claude receives English, and reads back in Chinese, so the whole conversation stays in compact English under the hood. On long chats that means noticeably more usage before you hit the limit.
+Token efficiency depends on the Claude model and translation direction. In our
+reproducible 3,481-sentence original-Chinese benchmark, Yifa's Google English
+translations used **18.9% fewer input tokens on Claude Sonnet 4.6**, but
+**18.6% more on Claude Sonnet 5**. Yifa therefore makes no blanket token-saving
+claim. See the [large-sample benchmark, raw translations, and verification
+scripts](benchmark/README.md).
 
 ## Features
 
 Ordinary translation extensions only translate what is shown on the page; they never change what you send. Yifa works on the message itself:
 
-- **Sends English, not Chinese.** Your input is translated to English before it leaves the box, so the model receives the compact English. A normal translator cannot do this.
+- **Sends English, not Chinese.** Your input is translated to English before it leaves the box, so the model receives the reviewed English text. A normal page translator cannot do this.
 - **Review before send.** The English lands in the box with your original Chinese shown right above it, so you can compare the two before it goes out. Enter to send, Esc to undo — a bad translation gets caught before the model ever sees it.
 - **Replies back in Chinese, three layouts.** Hybrid (default) replaces plain text in place and leaves code untouched; full bilingual; or plain-text only.
 - **Your own messages too.** Your sent bubble shows the English that went out, with the Chinese underneath, so scrolling back through the conversation stays readable.

@@ -1,0 +1,94 @@
+{
+  "benchmark": "Yifa default-engine original-Chinese workload benchmark",
+  "block_sensitivity": {
+    "adjusted_en_input_tokens": 130609,
+    "adjusted_english_reduction_percent": 18.9469,
+    "adjusted_zh_input_tokens": 161140,
+    "adjusted_zh_to_en_ratio": 1.233759,
+    "blocks_where_chinese_uses_more": 138,
+    "pair_count": 3481,
+    "raw_en_input_tokens": 131589,
+    "raw_zh_input_tokens": 162120,
+    "records": 140
+  },
+  "bootstrap": {
+    "english_reduction_95_percent_ci": [
+      17.9028,
+      19.9654
+    ],
+    "method": "paired block bootstrap after subtracting empty-message envelope",
+    "ratio_95_percent_ci": [
+      1.218068,
+      1.24946
+    ],
+    "samples": 10000,
+    "seed": 20260722
+  },
+  "by_corpus": {
+    "wmt2017": {
+      "en_input_tokens": 39541,
+      "english_reduction_percent": 21.0096,
+      "pair_count": 1000,
+      "zh_input_tokens": 50058,
+      "zh_to_en_ratio": 1.265977
+    },
+    "wmt2018": {
+      "en_input_tokens": 91219,
+      "english_reduction_percent": 17.894,
+      "pair_count": 2481,
+      "zh_input_tokens": 111099,
+      "zh_to_en_ratio": 1.217937
+    }
+  },
+  "envelope_baseline_sensitivity": {
+    "6": {
+      "adjusted_en_input_tokens": 130782,
+      "adjusted_english_reduction_percent": 20.5031,
+      "adjusted_zh_input_tokens": 164512,
+      "adjusted_zh_to_en_ratio": 1.25791,
+      "pair_count": 3481
+    },
+    "7": {
+      "adjusted_en_input_tokens": 127301,
+      "adjusted_english_reduction_percent": 20.9463,
+      "adjusted_zh_input_tokens": 161031,
+      "adjusted_zh_to_en_ratio": 1.264963,
+      "pair_count": 3481
+    },
+    "8": {
+      "adjusted_en_input_tokens": 123820,
+      "adjusted_english_reduction_percent": 21.4091,
+      "adjusted_zh_input_tokens": 157550,
+      "adjusted_zh_to_en_ratio": 1.272412,
+      "pair_count": 3481
+    }
+  },
+  "limitations": [
+    "The corpus is news text rather than private Claude chat history.",
+    "Google's unofficial endpoint can change independently of Yifa.",
+    "Translation quality is not scored; all outputs are retained.",
+    "Token Counting API results are estimates according to Anthropic."
+  ],
+  "model": "claude-sonnet-4-6",
+  "pair_count": 3481,
+  "pair_sensitivity": {
+    "adjusted_en_input_tokens": 127301,
+    "adjusted_english_reduction_percent": 20.9463,
+    "adjusted_zh_input_tokens": 161031,
+    "adjusted_zh_to_en_ratio": 1.264963,
+    "pair_count": 3481,
+    "pairs_where_chinese_uses_more": 3071,
+    "per_pair_ratio_median": 1.288889,
+    "per_pair_ratio_p10": 1.0,
+    "per_pair_ratio_p90": 1.684211
+  },
+  "primary_result": {
+    "en_input_tokens": 130760,
+    "english_reduction_percent": 18.8617,
+    "method": "sum of direct WMT17 and WMT18 corpus counts",
+    "zh_input_tokens": 161157,
+    "zh_to_en_ratio": 1.232464
+  },
+  "translation_engine": "google-unofficial",
+  "translation_text_sha256": "08ac4c8ac1ec6668fefc9f7e2b48815617481ceca5901c5476504de24ecce328"
+}

@@ -1,0 +1,55 @@
+{
+  "archives": {
+    "flores200": {
+      "bytes": 25585843,
+      "license": "CC BY-SA 4.0",
+      "path": "flores200_dataset.tar.gz",
+      "sha256": "b8b0b76783024b85797e5cc75064eb83fc5288b41e9654dabc7be6ae944011f6",
+      "url": "https://dl.fbaipublicfiles.com/nllb/flores200_dataset.tar.gz"
+    },
+    "wmt17": {
+      "bytes": 4461252,
+      "license": "WMT official evaluation data",
+      "path": "wmt17-test.tgz",
+      "sha256": "aa1a76f61c0ca68fbf62233ee90ea9ebe2b01b43323092728510037e05e73d8d",
+      "url": "https://data.statmt.org/wmt17/translation-task/test.tgz"
+    },
+    "wmt18": {
+      "bytes": 4517960,
+      "license": "WMT official evaluation data",
+      "path": "wmt18-test.tgz",
+      "sha256": "d4094eb9949571e90b162a690d8bb064fa10986d8f2afb9ae709809ca6bd92ff",
+      "url": "https://data.statmt.org/wmt18/translation-task/test.tgz"
+    }
+  },
+  "block_count": 322,
+  "block_size": 25,
+  "corpora": {
+    "flores200": 2009,
+    "wmt2017": 2001,
+    "wmt2018": 3981
+  },
+  "created_at_utc": "2026-07-24T01:14:58.382673+00:00",
+  "domains": {
+    "news": 5982,
+    "wikibooks": 652,
+    "wikinews": 689,
+    "wikivoyage": 668
+  },
+  "english_word_length_tertiles": {
+    "medium_max": 27,
+    "short_max": 18
+  },
+  "length_buckets": {
+    "long": 2478,
+    "medium": 2671,
+    "short": 2842
+  },
+  "original_languages": {
+    "en": 4510,
+    "zh": 3481
+  },
+  "pair_count": 7991,
+  "pair_id_sha256": "68da502b83947ee0bdcea4b593ffd16ebdbb1b6d267ad08962d520a655249113",
+  "text_sha256": "9c201fadfcc495819c35a207dec0272b84271f0c9c25273dba4ede83675df498"
+}

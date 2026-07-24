@@ -1,0 +1,296 @@
+{
+  "benchmark": "Yifa large-sample human-parallel Chinese/English token benchmark",
+  "block_count": 322,
+  "block_sensitivity": {
+    "adjusted_en_input_tokens": 374981,
+    "adjusted_english_reduction_percent": -0.3968,
+    "adjusted_zh_input_tokens": 373499,
+    "adjusted_zh_to_en_ratio": 0.996048,
+    "blocks_where_chinese_uses_more": 178,
+    "pair_count": 7991,
+    "raw_en_input_tokens": 376913,
+    "raw_zh_input_tokens": 375431,
+    "records": 322
+  },
+  "bootstrap": {
+    "english_reduction_95_percent_ci": [
+      -2.1705,
+      1.3062
+    ],
+    "method": "paired block bootstrap after subtracting empty-message envelope",
+    "ratio_95_percent_ci": [
+      0.978756,
+      1.013235
+    ],
+    "samples": 10000,
+    "seed": 20260722
+  },
+  "by_corpus": {
+    "flores200": {
+      "en_input_tokens": 83677,
+      "english_reduction_percent": 12.7938,
+      "pair_count": 2009,
+      "zh_input_tokens": 95953,
+      "zh_to_en_ratio": 1.146707
+    },
+    "wmt2017": {
+      "en_input_tokens": 94095,
+      "english_reduction_percent": 0.6116,
+      "pair_count": 2001,
+      "zh_input_tokens": 94674,
+      "zh_to_en_ratio": 1.006153
+    },
+    "wmt2018": {
+      "en_input_tokens": 197546,
+      "english_reduction_percent": -7.8255,
+      "pair_count": 3981,
+      "zh_input_tokens": 183209,
+      "zh_to_en_ratio": 0.927424
+    }
+  },
+  "by_corpus_block_sensitivity": {
+    "flores200": {
+      "adjusted_en_input_tokens": 83591,
+      "adjusted_english_reduction_percent": 12.8052,
+      "adjusted_zh_input_tokens": 95867,
+      "adjusted_zh_to_en_ratio": 1.146858,
+      "blocks_where_chinese_uses_more": 81,
+      "pair_count": 2009,
+      "raw_en_input_tokens": 84077,
+      "raw_zh_input_tokens": 96353,
+      "records": 81
+    },
+    "wmt2017": {
+      "adjusted_en_input_tokens": 94009,
+      "adjusted_english_reduction_percent": 0.6121,
+      "adjusted_zh_input_tokens": 94588,
+      "adjusted_zh_to_en_ratio": 1.006159,
+      "blocks_where_chinese_uses_more": 43,
+      "pair_count": 2001,
+      "raw_en_input_tokens": 94495,
+      "raw_zh_input_tokens": 95074,
+      "records": 81
+    },
+    "wmt2018": {
+      "adjusted_en_input_tokens": 197381,
+      "adjusted_english_reduction_percent": -7.8325,
+      "adjusted_zh_input_tokens": 183044,
+      "adjusted_zh_to_en_ratio": 0.927364,
+      "blocks_where_chinese_uses_more": 54,
+      "pair_count": 3981,
+      "raw_en_input_tokens": 198341,
+      "raw_zh_input_tokens": 184004,
+      "records": 160
+    }
+  },
+  "by_domain": {
+    "news": {
+      "adjusted_en_input_tokens": 285649,
+      "adjusted_english_reduction_percent": -5.0601,
+      "adjusted_zh_input_tokens": 271891,
+      "adjusted_zh_to_en_ratio": 0.951836,
+      "pair_count": 5982,
+      "pairs_where_chinese_uses_more": 2611,
+      "per_pair_ratio_median": 0.975,
+      "per_pair_ratio_p10": 0.686069,
+      "per_pair_ratio_p90": 1.318071
+    },
+    "wikibooks": {
+      "adjusted_en_input_tokens": 26415,
+      "adjusted_english_reduction_percent": 9.8956,
+      "adjusted_zh_input_tokens": 29316,
+      "adjusted_zh_to_en_ratio": 1.109824,
+      "pair_count": 652,
+      "pairs_where_chinese_uses_more": 438,
+      "per_pair_ratio_median": 1.097561,
+      "per_pair_ratio_p10": 0.87695,
+      "per_pair_ratio_p90": 1.357143
+    },
+    "wikinews": {
+      "adjusted_en_input_tokens": 28551,
+      "adjusted_english_reduction_percent": 15.3668,
+      "adjusted_zh_input_tokens": 33735,
+      "adjusted_zh_to_en_ratio": 1.18157,
+      "pair_count": 689,
+      "pairs_where_chinese_uses_more": 538,
+      "per_pair_ratio_median": 1.153846,
+      "per_pair_ratio_p10": 0.909091,
+      "per_pair_ratio_p90": 1.467451
+    },
+    "wikivoyage": {
+      "adjusted_en_input_tokens": 26697,
+      "adjusted_english_reduction_percent": 13.5684,
+      "adjusted_zh_input_tokens": 30888,
+      "adjusted_zh_to_en_ratio": 1.156984,
+      "pair_count": 668,
+      "pairs_where_chinese_uses_more": 515,
+      "per_pair_ratio_median": 1.142857,
+      "per_pair_ratio_p10": 0.90706,
+      "per_pair_ratio_p90": 1.421855
+    }
+  },
+  "by_length": {
+    "long": {
+      "adjusted_en_input_tokens": 176606,
+      "adjusted_english_reduction_percent": -7.6216,
+      "adjusted_zh_input_tokens": 164099,
+      "adjusted_zh_to_en_ratio": 0.929181,
+      "pair_count": 2478,
+      "pairs_where_chinese_uses_more": 930,
+      "per_pair_ratio_median": 0.936339,
+      "per_pair_ratio_p10": 0.673153,
+      "per_pair_ratio_p90": 1.268829
+    },
+    "medium": {
+      "adjusted_en_input_tokens": 117916,
+      "adjusted_english_reduction_percent": 4.1497,
+      "adjusted_zh_input_tokens": 123021,
+      "adjusted_zh_to_en_ratio": 1.043294,
+      "pair_count": 2671,
+      "pairs_where_chinese_uses_more": 1502,
+      "per_pair_ratio_median": 1.044444,
+      "per_pair_ratio_p10": 0.756757,
+      "per_pair_ratio_p90": 1.341463
+    },
+    "short": {
+      "adjusted_en_input_tokens": 72790,
+      "adjusted_english_reduction_percent": 7.5213,
+      "adjusted_zh_input_tokens": 78710,
+      "adjusted_zh_to_en_ratio": 1.08133,
+      "pair_count": 2842,
+      "pairs_where_chinese_uses_more": 1670,
+      "per_pair_ratio_median": 1.076923,
+      "per_pair_ratio_p10": 0.745213,
+      "per_pair_ratio_p90": 1.448276
+    }
+  },
+  "by_original_language": {
+    "en": {
+      "adjusted_en_input_tokens": 180607,
+      "adjusted_english_reduction_percent": 13.0217,
+      "adjusted_zh_input_tokens": 207646,
+      "adjusted_zh_to_en_ratio": 1.149712,
+      "pair_count": 4510,
+      "pairs_where_chinese_uses_more": 3322,
+      "per_pair_ratio_median": 1.133333,
+      "per_pair_ratio_p10": 0.9,
+      "per_pair_ratio_p90": 1.433333
+    },
+    "zh": {
+      "adjusted_en_input_tokens": 186705,
+      "adjusted_english_reduction_percent": -18.0303,
+      "adjusted_zh_input_tokens": 158184,
+      "adjusted_zh_to_en_ratio": 0.84724,
+      "pair_count": 3481,
+      "pairs_where_chinese_uses_more": 780,
+      "per_pair_ratio_median": 0.861538,
+      "per_pair_ratio_p10": 0.636364,
+      "per_pair_ratio_p90": 1.148148
+    }
+  },
+  "by_original_language_baseline_sensitivity": {
+    "5": {
+      "en": {
+        "adjusted_en_input_tokens": 185117,
+        "adjusted_english_reduction_percent": 12.7449,
+        "adjusted_zh_input_tokens": 212156,
+        "adjusted_zh_to_en_ratio": 1.146064,
+        "pair_count": 4510
+      },
+      "zh": {
+        "adjusted_en_input_tokens": 190186,
+        "adjusted_english_reduction_percent": -17.642,
+        "adjusted_zh_input_tokens": 161665,
+        "adjusted_zh_to_en_ratio": 0.850036,
+        "pair_count": 3481
+      }
+    },
+    "6": {
+      "en": {
+        "adjusted_en_input_tokens": 180607,
+        "adjusted_english_reduction_percent": 13.0217,
+        "adjusted_zh_input_tokens": 207646,
+        "adjusted_zh_to_en_ratio": 1.149712,
+        "pair_count": 4510
+      },
+      "zh": {
+        "adjusted_en_input_tokens": 186705,
+        "adjusted_english_reduction_percent": -18.0303,
+        "adjusted_zh_input_tokens": 158184,
+        "adjusted_zh_to_en_ratio": 0.84724,
+        "pair_count": 3481
+      }
+    },
+    "7": {
+      "en": {
+        "adjusted_en_input_tokens": 176097,
+        "adjusted_english_reduction_percent": 13.3108,
+        "adjusted_zh_input_tokens": 203136,
+        "adjusted_zh_to_en_ratio": 1.153546,
+        "pair_count": 4510
+      },
+      "zh": {
+        "adjusted_en_input_tokens": 183224,
+        "adjusted_english_reduction_percent": -18.436,
+        "adjusted_zh_input_tokens": 154703,
+        "adjusted_zh_to_en_ratio": 0.844338,
+        "pair_count": 3481
+      }
+    }
+  },
+  "empty_message_estimation": {
+    "method": "count one ASCII letter ('a') and subtract its one content token",
+    "note": "The API rejects empty user messages; pair-level sensitivity is also reported for baseline ±1."
+  },
+  "empty_message_input_tokens": 6,
+  "envelope_baseline_sensitivity": {
+    "5": {
+      "adjusted_en_input_tokens": 375303,
+      "adjusted_english_reduction_percent": -0.3964,
+      "adjusted_zh_input_tokens": 373821,
+      "adjusted_zh_to_en_ratio": 0.996051,
+      "pair_count": 7991
+    },
+    "6": {
+      "adjusted_en_input_tokens": 367312,
+      "adjusted_english_reduction_percent": -0.4051,
+      "adjusted_zh_input_tokens": 365830,
+      "adjusted_zh_to_en_ratio": 0.995965,
+      "pair_count": 7991
+    },
+    "7": {
+      "adjusted_en_input_tokens": 359321,
+      "adjusted_english_reduction_percent": -0.4142,
+      "adjusted_zh_input_tokens": 357839,
+      "adjusted_zh_to_en_ratio": 0.995876,
+      "pair_count": 7991
+    }
+  },
+  "limitations": [
+    "FLORES-200 and WMT are general/news translation corpora, not Claude chat logs.",
+    "Token Counting API results are estimates according to Anthropic.",
+    "The result is model-specific and may change for a different tokenizer.",
+    "The product-specific Google-translation pilot is reported separately."
+  ],
+  "manifest_text_sha256": "9c201fadfcc495819c35a207dec0272b84271f0c9c25273dba4ede83675df498",
+  "model": "claude-sonnet-5",
+  "pair_count": 7991,
+  "pair_sensitivity": {
+    "adjusted_en_input_tokens": 367312,
+    "adjusted_english_reduction_percent": -0.4051,
+    "adjusted_zh_input_tokens": 365830,
+    "adjusted_zh_to_en_ratio": 0.995965,
+    "pair_count": 7991,
+    "pairs_where_chinese_uses_more": 4102,
+    "per_pair_ratio_median": 1.02381,
+    "per_pair_ratio_p10": 0.714286,
+    "per_pair_ratio_p90": 1.36
+  },
+  "primary_result": {
+    "en_input_tokens": 375318,
+    "english_reduction_percent": -0.3964,
+    "method": "sum of one direct aggregate count per corpus",
+    "zh_input_tokens": 373836,
+    "zh_to_en_ratio": 0.996051
+  }
+}

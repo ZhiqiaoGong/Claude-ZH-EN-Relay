@@ -1,0 +1,86 @@
+{
+  "anthropic_model": "claude-sonnet-4-6",
+  "anthropic_version": "2023-06-01",
+  "benchmark": "Yifa Chinese-to-English prompt token benchmark",
+  "by_category": {
+    "architecture": {
+      "median_per_prompt_zh_to_en_ratio": 1.3054,
+      "n": 4,
+      "summed_en_input_tokens": 295,
+      "summed_english_reduction_percent": 23.38,
+      "summed_zh_input_tokens": 385,
+      "summed_zh_to_en_ratio": 1.3051
+    },
+    "coding": {
+      "median_per_prompt_zh_to_en_ratio": 1.4603,
+      "n": 5,
+      "summed_en_input_tokens": 288,
+      "summed_english_reduction_percent": 31.43,
+      "summed_zh_input_tokens": 420,
+      "summed_zh_to_en_ratio": 1.4583
+    },
+    "data-analysis": {
+      "median_per_prompt_zh_to_en_ratio": 1.2674,
+      "n": 4,
+      "summed_en_input_tokens": 275,
+      "summed_english_reduction_percent": 20.75,
+      "summed_zh_input_tokens": 347,
+      "summed_zh_to_en_ratio": 1.2618
+    },
+    "debugging": {
+      "median_per_prompt_zh_to_en_ratio": 1.3912,
+      "n": 4,
+      "summed_en_input_tokens": 289,
+      "summed_english_reduction_percent": 27.57,
+      "summed_zh_input_tokens": 399,
+      "summed_zh_to_en_ratio": 1.3806
+    },
+    "productivity": {
+      "median_per_prompt_zh_to_en_ratio": 1.35,
+      "n": 5,
+      "summed_en_input_tokens": 375,
+      "summed_english_reduction_percent": 26.61,
+      "summed_zh_input_tokens": 511,
+      "summed_zh_to_en_ratio": 1.3627
+    },
+    "reasoning": {
+      "median_per_prompt_zh_to_en_ratio": 1.4162,
+      "n": 4,
+      "summed_en_input_tokens": 267,
+      "summed_english_reduction_percent": 30.47,
+      "summed_zh_input_tokens": 384,
+      "summed_zh_to_en_ratio": 1.4382
+    },
+    "technical-writing": {
+      "median_per_prompt_zh_to_en_ratio": 1.5319,
+      "n": 4,
+      "summed_en_input_tokens": 286,
+      "summed_english_reduction_percent": 30.24,
+      "summed_zh_input_tokens": 410,
+      "summed_zh_to_en_ratio": 1.4336
+    }
+  },
+  "limitations": [
+    "Anthropic documents token counts as estimates.",
+    "The result applies to this corpus, translation engine, and model.",
+    "Prompt-token reduction is not an end-to-end Pro or Max usage-limit claim.",
+    "Translation quality must be reviewed separately from token efficiency."
+  ],
+  "measured_at_utc": "2026-07-23T04:27:31.377642+00:00",
+  "per_prompt_aggregate": {
+    "median_per_prompt_zh_to_en_ratio": 1.3879,
+    "n": 30,
+    "summed_en_input_tokens": 2075,
+    "summed_english_reduction_percent": 27.35,
+    "summed_zh_input_tokens": 2856,
+    "summed_zh_to_en_ratio": 1.3764
+  },
+  "primary_result": {
+    "en_input_tokens": 1959,
+    "english_reduction_percent": 27.79,
+    "method": "all prompt texts joined into one message per language",
+    "zh_input_tokens": 2713,
+    "zh_to_en_ratio": 1.3849
+  },
+  "translation_engine": "google-unofficial"
+}

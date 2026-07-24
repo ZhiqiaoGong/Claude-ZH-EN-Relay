@@ -1,0 +1,30 @@
+{"id":"coding-01","category":"coding","length":"short","zh":"用 JavaScript 写一个函数，接收整数数组并返回出现频率最高的三个数字；频率相同时按数字从小到大排序。"}
+{"id":"coding-02","category":"coding","length":"short","zh":"解释 Python 中浅拷贝和深拷贝的区别，并各给一个会产生不同结果的最小示例。"}
+{"id":"coding-03","category":"coding","length":"medium","zh":"请为下面的 REST API 设计分页响应格式。需要同时支持基于游标的下一页查询、稳定排序和总数未知的情况，并说明客户端在数据被并发插入时应该如何避免重复展示记录。"}
+{"id":"coding-04","category":"coding","length":"medium","zh":"我有一个 Node.js 服务，需要并发请求三个上游接口。任何一个接口失败时保留其他成功结果，整体超时为两秒，并记录每个接口的耗时。请给出使用原生 fetch 和 AbortController 的实现。"}
+{"id":"coding-05","category":"coding","length":"long","zh":"请设计一个 Python 命令行工具，把目录中的 Markdown 文件转换为带目录的单个 HTML 文档。要求保留代码高亮、正确处理相对图片路径、忽略隐藏目录，并在发现重复标题锚点时生成稳定且唯一的 ID。先给出模块划分，再实现核心遍历和合并逻辑，最后列出至少六个边界测试。"}
+{"id":"debugging-01","category":"debugging","length":"short","zh":"这个正则表达式在输入为空字符串时发生死循环。请解释原因并给出不会回溯爆炸的修复方案。"}
+{"id":"debugging-02","category":"debugging","length":"medium","zh":"React 页面在开发模式下会发送两次网络请求，但生产环境只有一次。请求写在 useEffect 中，依赖数组为空。请判断最可能的原因，并给出既能兼容严格模式又不会隐藏真实重复请求的修改方法。"}
+{"id":"debugging-03","category":"debugging","length":"medium","zh":"一段 SQL 在小表上运行正常，数据增长到两千万行后从一秒变成四十秒。执行计划显示对 orders 做了全表扫描，而查询条件是 customer_id 和 created_at。请分析可能缺失的索引，并说明联合索引字段顺序的选择依据。"}
+{"id":"debugging-04","category":"debugging","length":"long","zh":"我们有一个偶发的任务重复执行问题：消费者从队列取到消息后先写数据库，再确认消息；进程可能在两步之间崩溃。消息至少投递一次，数据库是 PostgreSQL，任务会向第三方支付接口发起请求。请解释为什么简单重试不安全，并设计包含幂等键、状态表、事务边界和异常恢复流程的解决方案。"}
+{"id":"architecture-01","category":"architecture","length":"short","zh":"什么时候应该选择单体应用而不是微服务？请从团队规模、部署复杂度和故障隔离三个方面回答。"}
+{"id":"architecture-02","category":"architecture","length":"medium","zh":"设计一个支持十万日活用户的通知系统，需要发送站内信、邮件和移动推送。用户可以按渠道退订，失败任务要重试，但同一条通知不能重复发送。请给出核心组件和数据流。"}
+{"id":"architecture-03","category":"architecture","length":"medium","zh":"我们要把一个同步图片处理接口改造成异步任务。客户端上传后应立即获得任务 ID，可以查询进度，也可以在完成时接收 webhook。请比较轮询、服务器推送和 webhook 的职责，并设计状态机。"}
+{"id":"architecture-04","category":"architecture","length":"long","zh":"为一个多租户 SaaS 审计日志平台设计存储方案。每天写入约五亿条事件，热数据保留三十天，冷数据保留七年；查询通常按租户、用户和时间范围过滤。系统必须保证日志不可被普通管理员篡改，同时支持租户级导出和依法删除个人信息。请讨论分区、索引、冷热分层、完整性校验和删除语义之间的权衡。"}
+{"id":"data-01","category":"data-analysis","length":"short","zh":"一组收入数据平均值明显高于中位数，这通常说明什么？还应该查看哪些统计量再下结论？"}
+{"id":"data-02","category":"data-analysis","length":"medium","zh":"A/B 测试中实验组转化率为 12.4%，对照组为 11.8%，两组各有两万名用户。请计算绝对提升和相对提升，并说明为什么还不能只凭这两个数字宣布实验成功。"}
+{"id":"data-03","category":"data-analysis","length":"medium","zh":"我有一张包含用户注册时间、首次付费时间和渠道的表。请给出 SQL 思路，计算每个获客渠道按注册周分组的七日付费转化率，并说明如何处理尚未完整观察七天的新用户。"}
+{"id":"data-04","category":"data-analysis","length":"long","zh":"某订阅产品的月流失率连续三个季度下降，但月经常性收入增长也同时放缓。请提出一个分析框架，区分这是定价、获客质量、用户结构变化还是统计口径导致的。框架应包含需要补充的数据、分群方式、至少三个可检验假设，以及每个假设对应的判定指标。"}
+{"id":"writing-01","category":"technical-writing","length":"short","zh":"把这句话改得更简洁但保持专业语气：由于目前存在一些我们尚未完全解决的技术限制，因此该功能暂时还不能向全部用户开放。"}
+{"id":"writing-02","category":"technical-writing","length":"medium","zh":"为一次数据库维护写一则面向客户的状态页通知。维护窗口为周日凌晨两点到三点，期间只读查询正常，写入操作可能延迟，预计不会丢失数据。语气要明确、克制，不要使用营销语言。"}
+{"id":"writing-03","category":"technical-writing","length":"medium","zh":"将下面的工程变更整理成发布说明：缓存键加入租户 ID；旧缓存会自然过期；修复了不同企业用户偶尔看到错误头像的问题；不需要客户采取操作。请分别写一个一句话摘要和一个包含影响范围的详细版本。"}
+{"id":"writing-04","category":"technical-writing","length":"long","zh":"请起草一份内部技术决策记录，主题是把后台任务队列从自建 Redis 迁移到托管消息服务。背景包括值班团队规模较小、过去半年发生过两次持久化故障、托管方案成本更高。文档需要包含背景、决策、备选方案、正面影响、负面影响、迁移风险和回滚条件，避免把尚未验证的收益写成事实。"}
+{"id":"reasoning-01","category":"reasoning","length":"short","zh":"如果所有通过审计的服务都启用了日志，而服务甲没有日志，能否推出服务甲没有通过审计？请说明使用了什么推理规则。"}
+{"id":"reasoning-02","category":"reasoning","length":"medium","zh":"一个团队认为增加代码评审人数一定能减少缺陷，但最近的数据表明评审人数更多的变更反而缺陷率更高。请给出至少三种不需要否定评审价值也能解释该相关性的原因。"}
+{"id":"reasoning-03","category":"reasoning","length":"medium","zh":"产品经理提出：用户很少使用高级搜索，所以应该删除它。请识别这个结论中缺失的信息，并设计一个成本较低的验证方案，区分用户没有需求、用户找不到入口和功能体验太差这三种情况。"}
+{"id":"reasoning-04","category":"reasoning","length":"long","zh":"一家公司计划根据客服工单的平均处理时间给团队排名。请分析这个指标可能诱发的行为偏差，例如挑选简单工单、过早关闭或拆分复杂问题。然后设计一个更稳健的评价体系，兼顾速度、解决质量、客户满意度和问题难度，并说明如何防止团队通过操纵单个指标获得高分。"}
+{"id":"productivity-01","category":"productivity","length":"short","zh":"把下面这些任务按紧急且重要、重要不紧急、紧急不重要、两者都不是进行分类，并指出哪些信息不足以判断。"}
+{"id":"productivity-02","category":"productivity","length":"medium","zh":"我下周要向工程、销售和客服三个团队介绍新的权限系统。请设计一个四十五分钟的会议议程，既解释为什么要改，也让不同角色知道上线前各自需要完成什么。预留十分钟问答。"}
+{"id":"productivity-03","category":"productivity","length":"medium","zh":"请把一次模糊的项目目标拆成可执行计划：我们希望在本季度提升新用户激活率。先列出需要澄清的问题，再给出不依赖具体答案也能开始的研究、埋点检查和实验准备工作。"}
+{"id":"productivity-04","category":"productivity","length":"long","zh":"我需要在两周内完成一次遗留系统交接，但原负责人只能参加三次各一小时的会议。请制定交接计划，覆盖系统架构、部署流程、监控告警、常见故障、访问权限和未完成风险。明确每次会议的目标、会前材料、会后产出，以及哪些知识应该通过实际演练而不是只写文档来验证。"}
+{"id":"productivity-05","category":"productivity","length":"long","zh":"为一个跨时区远程团队制定每周协作节奏。成员分布在旧金山、伦敦和新加坡，需要减少夜间会议，同时保证阻塞问题能在二十四小时内得到响应。请安排同步会议、异步状态更新、决策记录和紧急升级渠道，并解释哪些沟通必须同步、哪些应该默认异步。"}
